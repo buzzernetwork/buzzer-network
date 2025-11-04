@@ -59,13 +59,7 @@ export default function CampaignsPage() {
 
   return (
     <div
-      className="min-h-screen py-8"
-      style={{
-        backgroundImage: "url('/bg.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
+      className="min-h-screen py-8 bg-frosted-dark"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between items-center mb-8">
