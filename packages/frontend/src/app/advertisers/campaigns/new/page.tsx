@@ -96,13 +96,7 @@ export default function NewCampaignPage() {
 
   return (
     <div
-      className="min-h-screen py-8"
-      style={{
-        backgroundImage: "url('/bg.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
+      className="min-h-screen py-8 bg-frosted-dark"
     >
       <div className="container mx-auto px-4 max-w-4xl">
         <GlassCard variant="dark" blur="xl" className="p-8">
