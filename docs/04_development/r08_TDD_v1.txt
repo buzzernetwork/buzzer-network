@@ -1,0 +1,652 @@
+TEST-DRIVEN DEVELOPMENT PLAN v1 - BUZZER NETWORK
+==================================================
+
+Consistency References:
+- Architecture L2 (r06): Detailed component breakdown, database schema, API endpoints
+- PRD v2 (r04): Functional requirements, user journeys, success metrics
+- Domain Analysis (r02): Technical patterns, blockchain integration, X402 protocol
+
+OBJECTIVE: Implement r06_arch_L2.txt in the most minimalistic way possible while maintaining consistency with r04_prd_v2.txt & r02_domain_analysis.txt
+
+PHILOSOPHY: Start with MVP, build incrementally, test continuously, deploy iteratively
+
+RESOURCE LINKS:
+---------------
+
+X402 Protocol:
+- Official Docs: https://www.x402.org/
+- Official Repo (Coinbase): https://github.com/coinbase/x402 - PRIMARY REFERENCE
+- Whitepaper: https://www.x402.org/x402-whitepaper.pdf
+- GitHub SDK: https://github.com/samthedataman/x402-sdk
+- Starter Kit: https://github.com/vercel-labs/x402-ai-starter
+- Awesome X402: https://github.com/Merit-Systems/awesome-x402
+- Reference Implementation: Ad-402 (https://ethglobal.com/showcase/ad-402-5bnqt)
+
+BASE Blockchain:
+- BASE Docs: https://docs.base.org/
+- BASE Explorer: https://basescan.org/
+- BASE Bridge: https://bridge.base.org/
+
+Smart Contracts:
+- OpenZeppelin: https://docs.openzeppelin.com/contracts
+- Hardhat: https://hardhat.org/
+- Foundry: https://book.getfoundry.sh/
+
+Development Tools:
+- ethers.js: https://docs.ethers.io/
+- wagmi: https://wagmi.sh/
+- Next.js: https://nextjs.org/docs
+- TypeScript: https://www.typescriptlang.org/docs/
+
+Database:
+- PostgreSQL: https://www.postgresql.org/docs/
+- TimescaleDB: https://docs.timescale.com/
+- Redis: https://redis.io/docs/
+
+Monitoring:
+- Tenderly: https://tenderly.co/
+- Sentry: https://docs.sentry.io/
+- DataDog: https://docs.datadoghq.com/
+
+OPEN SOURCE BUILDING BLOCKS:
+----------------------------
+See r13_open_source_building_blocks.txt for complete list.
+
+Key Building Blocks to Use:
+- OpenZeppelin Contracts: https://github.com/OpenZeppelin/openzeppelin-contracts
+  * Escrow contracts (PaymentEscrow base)
+  * PaymentSplitter (revenue sharing)
+  * AccessControl (permissions)
+  * ReentrancyGuard (security)
+- wagmi: https://wagmi.sh/ (React hooks for Ethereum/BASE)
+- ethers.js: https://docs.ethers.io/ (Wallet interactions)
+- IPFS/Pinata: https://docs.pinata.cloud/ (Ad creative storage)
+- ioredis: https://github.com/redis/ioredis (Redis client)
+- Knex.js: https://knexjs.org/ (Database migrations)
+- Fastify: https://www.fastify.io/ (Low-latency API server)
+
+Reference Implementations:
+- Ad-402: https://ethglobal.com/showcase/ad-402-5bnqt (X402 ad network)
+- Adshares: https://adshares.net/ (Complete ad network)
+- M2M Protocol: https://github.com/AndreaRettaroli/m2m (X402 on BASE)
+
+1. TDD APPROACH
+---------------
+
+Strategy:
+- Write tests first (unit, integration, contract)
+- Implement minimal code to pass tests
+- Refactor and optimize
+- Repeat for each feature
+
+Testing Pyramid:
+- Unit Tests: 70% (individual functions, components)
+- Integration Tests: 20% (service interactions, database)
+- E2E Tests: 10% (full user journeys)
+
+2. IMPLEMENTATION PHASES
+------------------------
+
+PHASE 1: FOUNDATION & INFRASTRUCTURE
+====================================
+
+Step 1.1: Project Setup
+- [ ] Initialize monorepo structure (packages: frontend, backend, contracts)
+- [ ] Setup TypeScript configuration
+- [ ] Setup ESLint, Prettier
+- [ ] Setup Git repository, .gitignore
+- [ ] Setup package.json with dependencies
+- [ ] Create README.md with setup instructions
+
+Step 1.2: Database Setup
+- [ ] Setup PostgreSQL database (local + Docker)
+- [ ] Create database migration system (Knex.js or TypeORM)
+- [ ] Write migration: Create publishers table
+- [ ] Write migration: Create advertisers table
+- [ ] Write migration: Create campaigns table
+- [ ] Write migration: Create ad_slots table
+- [ ] Write migration: Create impressions table (TimescaleDB)
+- [ ] Write migration: Create clicks table (TimescaleDB)
+- [ ] Write migration: Create settlements table
+- [ ] Write tests for migrations
+- [ ] Setup database connection pooling
+
+Step 1.3: Redis Setup
+- [ ] Setup Redis (local + Docker)
+- [ ] Create Redis client wrapper
+- [ ] Write tests for Redis operations
+- [ ] Setup Redis connection pooling
+
+Step 1.4: Smart Contract Setup
+- [ ] Initialize Hardhat project
+- [ ] Configure BASE network (testnet)
+- [ ] Write test: PaymentEscrow.sol deployment
+- [ ] Write test: PublisherPayout.sol deployment
+- [ ] Write test: PublisherRegistry.sol deployment
+- [ ] Write test: CampaignRegistry.sol deployment
+- [ ] Setup contract verification scripts
+
+Step 1.5: Backend Foundation
+- [ ] Initialize Express.js server
+- [ ] Setup middleware (CORS, body-parser, error-handler)
+- [ ] Create API route structure
+- [ ] Setup environment variables (dotenv)
+- [ ] Create database connection module
+- [ ] Create Redis connection module
+- [ ] Create smart contract interaction module (ethers.js)
+- [ ] Write health check endpoint: GET /health
+- [ ] Write tests for health check
+
+Step 1.6: Frontend Foundation
+- [ ] Initialize Next.js project
+- [ ] Setup Tailwind CSS
+- [ ] Setup wallet connection (wagmi + ethers.js)
+- [ ] Create layout components (Header, Footer, Navigation)
+- [ ] Create wallet connection component
+- [ ] Create landing page (/)
+- [ ] Write tests for wallet connection
+
+PHASE 2: CORE AUTHENTICATION & USER MANAGEMENT
+==============================================
+
+Step 2.1: Wallet Authentication (Backend)
+- [ ] Write test: Wallet signature verification
+- [ ] Implement wallet signature verification function
+- [ ] Write test: JWT token generation
+- [ ] Implement JWT token generation
+- [ ] Write test: Authentication middleware
+- [ ] Implement authentication middleware
+- [ ] Write test: API endpoint protection
+- [ ] Add auth protection to routes
+- [ ] Write integration test: Full auth flow
+
+Step 2.2: Publisher Registration (Backend)
+- [ ] Write test: Create publisher (POST /api/v1/publishers)
+- [ ] Implement publisher creation endpoint
+- [ ] Write test: Validate wallet address
+- [ ] Write test: Validate email format
+- [ ] Write test: Validate website URL
+- [ ] Write test: Duplicate wallet prevention
+- [ ] Implement validation logic
+- [ ] Write integration test: Publisher registration flow
+
+Step 2.3: Publisher Registration (Frontend)
+- [ ] Write test: Publisher registration form
+- [ ] Create publisher registration page (/onboarding)
+- [ ] Create registration form component
+- [ ] Implement wallet connection in form
+- [ ] Implement form submission
+- [ ] Write test: Form validation
+- [ ] Write E2E test: Complete registration flow
+
+Step 2.4: Advertiser Registration (Backend)
+- [ ] Write test: Create advertiser (POST /api/v1/advertisers)
+- [ ] Implement advertiser creation endpoint
+- [ ] Write test: Validate company information
+- [ ] Implement validation logic
+- [ ] Write integration test: Advertiser registration flow
+
+Step 2.5: Advertiser Registration (Frontend)
+- [ ] Write test: Advertiser registration form
+- [ ] Create advertiser registration page
+- [ ] Create registration form component
+- [ ] Implement form submission
+- [ ] Write E2E test: Complete registration flow
+
+PHASE 3: PUBLISHER DOMAIN VERIFICATION & QUALITY
+================================================
+
+Step 3.1: Domain Verification Service (Backend)
+- [ ] Write test: DNS TXT record verification
+- [ ] Implement DNS verification function
+- [ ] Write test: HTML meta tag verification
+- [ ] Implement HTML meta tag verification function
+- [ ] Write test: File upload verification
+- [ ] Implement file upload verification function
+- [ ] Write test: Verification endpoint (POST /api/v1/publishers/:id/verify)
+- [ ] Implement verification endpoint
+- [ ] Write integration test: Domain verification flow
+
+Step 3.2: Quality Scoring Service (Backend)
+- [ ] Write test: Quality score calculation
+- [ ] Implement basic quality scoring algorithm
+- [ ] Write test: Traffic quality check (mock)
+- [ ] Write test: Content quality check (mock)
+- [ ] Write test: Domain authority check (mock)
+- [ ] Implement quality scoring endpoint
+- [ ] Write test: Publisher approval threshold (score >= 70)
+- [ ] Implement approval logic
+
+Step 3.3: Publisher Status Management (Backend)
+- [ ] Write test: Update publisher status
+- [ ] Implement status update endpoint
+- [ ] Write test: Approved publishers can integrate
+- [ ] Write test: Rejected publishers cannot integrate
+- [ ] Implement status checks
+
+Step 3.4: Publisher Dashboard - Status (Frontend)
+- [ ] Write test: Publisher dashboard displays status
+- [ ] Create publisher dashboard page (/dashboard)
+- [ ] Create status display component
+- [ ] Implement status fetching and display
+- [ ] Write E2E test: View publisher status
+
+PHASE 4: AD SLOT INTEGRATION
+=============================
+
+Step 4.1: Ad Slot Creation (Backend)
+- [ ] Write test: Create ad slot (POST /api/v1/publishers/:id/slots)
+- [ ] Implement ad slot creation endpoint
+- [ ] Write test: Validate slot format (banner/native/video)
+- [ ] Write test: Validate dimensions
+- [ ] Implement validation logic
+- [ ] Write integration test: Ad slot creation
+
+Step 4.2: Integration Code Generator (Backend)
+- [ ] Write test: Generate X402-compliant code
+- [ ] Implement code generation function
+- [ ] Write test: Code includes correct pub_id and slot_id
+- [ ] Write test: Code includes correct format
+- [ ] Write test: Integration code endpoint (GET /api/v1/publishers/:id/integration-code)
+- [ ] Implement integration code endpoint
+
+Step 4.3: Publisher Dashboard - Integration (Frontend)
+- [ ] Write test: Display integration code
+- [ ] Create integration code display component
+- [ ] Implement code fetching and display
+- [ ] Add copy-to-clipboard functionality
+- [ ] Write E2E test: View and copy integration code
+
+PHASE 5: CAMPAIGN CREATION & MANAGEMENT
+========================================
+
+Step 5.1: Campaign Creation (Backend)
+- [ ] Write test: Create campaign (POST /api/v1/campaigns)
+- [ ] Implement campaign creation endpoint
+- [ ] Write test: Validate campaign data
+- [ ] Write test: Validate budget amounts
+- [ ] Write test: Validate targeting JSON
+- [ ] Write test: Validate creative format
+- [ ] Implement validation logic
+- [ ] Write integration test: Campaign creation
+
+Step 5.2: Campaign Funding (Backend + Smart Contract)
+- [ ] Write test: Fund campaign (POST /api/v1/campaigns/:id/fund)
+- [ ] Write test: Smart contract deposit function
+- [ ] Implement PaymentEscrow.deposit() call
+- [ ] Write test: Update campaign budget in database
+- [ ] Implement funding endpoint
+- [ ] Write test: Handle insufficient funds
+- [ ] Write integration test: Campaign funding flow
+
+Step 5.3: Creative Upload (Backend)
+- [ ] Write test: Upload creative (POST /api/v1/campaigns/:id/creative)
+- [ ] Write test: Validate file size (max 5MB)
+- [ ] Write test: Validate file format (JPG, PNG, GIF, MP4)
+- [ ] Write test: Upload to IPFS
+- [ ] Implement IPFS upload function
+- [ ] Write test: Store creative URL in database
+- [ ] Implement creative upload endpoint
+- [ ] Write integration test: Creative upload flow
+
+Step 5.4: Campaign Management (Backend)
+- [ ] Write test: Get campaign (GET /api/v1/campaigns/:id)
+- [ ] Write test: Update campaign (PATCH /api/v1/campaigns/:id)
+- [ ] Write test: Pause campaign (POST /api/v1/campaigns/:id/pause)
+- [ ] Write test: Resume campaign (POST /api/v1/campaigns/:id/resume)
+- [ ] Write test: List campaigns (GET /api/v1/campaigns)
+- [ ] Implement all campaign management endpoints
+- [ ] Write integration test: Campaign management flow
+
+Step 5.5: Campaign Dashboard (Frontend)
+- [ ] Write test: Display campaign list
+- [ ] Create campaign list page (/campaigns)
+- [ ] Create campaign card component
+- [ ] Write test: Campaign creation form
+- [ ] Create campaign creation page (/campaigns/new)
+- [ ] Create campaign builder component (wizard)
+- [ ] Implement form submission
+- [ ] Write E2E test: Create and view campaign
+
+PHASE 6: AD SERVING (X402 COMPLIANT)
+=====================================
+
+Step 6.1: X402 SDK Integration (Backend)
+- [ ] Install x402-sdk package
+- [ ] Write test: X402 middleware initialization
+- [ ] Configure X402 middleware (BASE chain, wallet settings)
+- [ ] Write test: X402 middleware integration
+- [ ] Implement X402 middleware in Express/Fastify
+- [ ] Write test: HTTP 402 status code handling
+- [ ] Implement 402 response for payment-required scenarios
+
+Step 6.2: X402 Ad Request Endpoint (Backend)
+- [ ] Write test: X402 ad request (GET /x402/ad)
+- [ ] Write test: Validate required parameters (pub_id, slot_id, format)
+- [ ] Write test: Validate optional parameters (geo, device)
+- [ ] Write test: Handle X402 payment headers
+- [ ] Implement ad request endpoint with X402 middleware
+- [ ] Write test: Return X402-compliant response format (200 OK)
+- [ ] Write test: Return 402 Payment Required when needed
+- [ ] Implement response formatting
+- [ ] Write integration test: Ad request flow
+
+Step 6.3: Matching Engine (Backend)
+- [ ] Write test: Match campaigns for publisher
+- [ ] Write test: Filter by geographic targeting
+- [ ] Write test: Filter by category targeting
+- [ ] Write test: Filter by quality score requirement
+- [ ] Write test: Filter by device type
+- [ ] Write test: Filter by budget availability
+- [ ] Write test: Rank by bid amount
+- [ ] Implement matching algorithm
+- [ ] Write test: Cache campaign data in Redis
+- [ ] Implement Redis caching
+- [ ] Write integration test: Matching engine with cache
+
+Step 6.4: Ad Selection (Backend)
+- [ ] Write test: Select best ad from matched campaigns
+- [ ] Write test: Handle no matching campaigns (return empty ad)
+- [ ] Implement ad selection logic
+- [ ] Write test: Return ad creative URL
+- [ ] Write test: Generate tracking URLs
+- [ ] Implement tracking URL generation
+- [ ] Write integration test: Full ad serving flow
+
+Step 6.4: Ad Script (Frontend - X402 Client)
+- [ ] Write test: Ad script loads and makes request
+- [ ] Create X402 ad script (x402-ad.js)
+- [ ] Implement ad request to /x402/ad endpoint
+- [ ] Write test: Script displays ad on page
+- [ ] Implement ad rendering (banner format)
+- [ ] Write test: Script fires impression event
+- [ ] Implement impression tracking
+- [ ] Write E2E test: Ad displays and tracks impression
+
+PHASE 7: IMPRESSION & CLICK TRACKING
+=====================================
+
+Step 7.1: Impression Tracking (Backend)
+- [ ] Write test: Log impression (POST /track/impression)
+- [ ] Write test: Validate impression event data
+- [ ] Write test: Detect duplicate impressions (idempotency)
+- [ ] Implement duplicate detection
+- [ ] Write test: Basic fraud detection (bot check)
+- [ ] Implement basic fraud detection
+- [ ] Write test: Store impression in TimescaleDB
+- [ ] Implement impression logging
+- [ ] Write test: Update campaign spend
+- [ ] Implement spend calculation
+- [ ] Write integration test: Impression tracking flow
+
+Step 7.2: Click Tracking (Backend)
+- [ ] Write test: Log click (GET /track/click/:trackingId)
+- [ ] Write test: Validate click event data
+- [ ] Write test: Detect duplicate clicks
+- [ ] Write test: Basic click fraud detection
+- [ ] Write test: Redirect to advertiser landing page
+- [ ] Implement click tracking and redirect
+- [ ] Write test: Store click in TimescaleDB
+- [ ] Write test: Update campaign spend (CPC)
+- [ ] Write integration test: Click tracking flow
+
+Step 7.3: Fraud Detection Enhancement (Backend)
+- [ ] Write test: Bot detection (User-Agent analysis)
+- [ ] Implement bot detection
+- [ ] Write test: Rate limiting per IP
+- [ ] Implement rate limiting
+- [ ] Write test: Invalid traffic patterns
+- [ ] Implement pattern detection
+- [ ] Write integration test: Fraud detection flow
+
+PHASE 8: ANALYTICS & REPORTING
+===============================
+
+Step 8.1: Publisher Analytics (Backend)
+- [ ] Write test: Get publisher earnings (GET /api/v1/publishers/:id/earnings)
+- [ ] Write test: Calculate earnings from impressions
+- [ ] Write test: Calculate earnings from clicks
+- [ ] Write test: Filter by date range
+- [ ] Implement earnings calculation
+- [ ] Write test: Get publisher impressions/clicks
+- [ ] Implement analytics queries (TimescaleDB)
+- [ ] Write integration test: Publisher analytics
+
+Step 8.2: Campaign Analytics (Backend)
+- [ ] Write test: Get campaign performance (GET /api/v1/campaigns/:id/analytics)
+- [ ] Write test: Calculate impressions, clicks, CTR
+- [ ] Write test: Calculate spend
+- [ ] Write test: Filter by date range
+- [ ] Implement analytics queries
+- [ ] Write integration test: Campaign analytics
+
+Step 8.3: Analytics Dashboard (Frontend)
+- [ ] Write test: Display publisher analytics
+- [ ] Create publisher analytics page (/dashboard/analytics)
+- [ ] Create earnings chart component
+- [ ] Create metrics display component
+- [ ] Implement data fetching and display
+- [ ] Write test: Display campaign analytics
+- [ ] Create campaign analytics page
+- [ ] Write E2E test: View analytics
+
+PHASE 9: PAYMENT SETTLEMENT
+============================
+
+Step 9.1: Earnings Aggregation (Backend)
+- [ ] Write test: Aggregate publisher earnings for date range
+- [ ] Write test: Group by publisher and token type
+- [ ] Write test: Calculate revenue share (85/15)
+- [ ] Implement earnings aggregation function
+- [ ] Write test: Handle minimum payout threshold
+- [ ] Implement threshold logic
+- [ ] Write integration test: Earnings aggregation
+
+Step 9.2: Settlement Job (Backend)
+- [ ] Write test: Settlement job execution
+- [ ] Write test: Fetch pending earnings
+- [ ] Write test: Batch payment preparation
+- [ ] Implement settlement job (cron job)
+- [ ] Write test: Execute batch payments via smart contract
+- [ ] Implement PublisherPayout.batchPayout() call
+- [ ] Write test: Update settlement records
+- [ ] Write test: Handle settlement failures
+- [ ] Write integration test: Settlement flow
+
+Step 9.3: Payment History (Backend)
+- [ ] Write test: Get payment history (GET /api/v1/publishers/:id/payments)
+- [ ] Write test: Filter by date range
+- [ ] Implement payment history endpoint
+- [ ] Write integration test: Payment history
+
+Step 9.4: Payment Dashboard (Frontend)
+- [ ] Write test: Display earnings and payments
+- [ ] Create earnings page (/dashboard/earnings)
+- [ ] Create payment history component
+- [ ] Implement data fetching and display
+- [ ] Write E2E test: View earnings and payments
+
+PHASE 10: SMART CONTRACT INTEGRATION
+=====================================
+
+Step 10.1: PaymentEscrow Contract (Complete)
+- [ ] Write test: Deposit function
+- [ ] Write test: Withdraw function
+- [ ] Write test: Spend function (authorized only)
+- [ ] Write test: Get balance function
+- [ ] Implement all contract functions
+- [ ] Write test: Reentrancy protection
+- [ ] Write test: Overflow protection
+- [ ] Write test: Access control
+- [ ] Deploy to BASE testnet
+- [ ] Verify contract on BaseScan
+
+Step 10.2: PublisherPayout Contract (Complete)
+- [ ] Write test: Single payout function
+- [ ] Write test: Batch payout function
+- [ ] Write test: Get pending earnings function
+- [ ] Implement all contract functions
+- [ ] Write test: Gas optimization (batch)
+- [ ] Write test: Access control
+- [ ] Deploy to BASE testnet
+- [ ] Verify contract on BaseScan
+
+Step 10.3: PublisherRegistry Contract (Complete)
+- [ ] Write test: Register publisher function
+- [ ] Write test: Update payment wallet function
+- [ ] Write test: Get publisher function
+- [ ] Implement all contract functions
+- [ ] Deploy to BASE testnet
+- [ ] Verify contract on BaseScan
+
+Step 10.4: Contract Integration (Backend)
+- [ ] Write test: Connect to deployed contracts
+- [ ] Implement contract interaction module
+- [ ] Write test: Deposit to escrow
+- [ ] Write test: Execute payout
+- [ ] Write test: Register publisher on-chain
+- [ ] Implement all contract calls
+- [ ] Write integration test: Full contract integration
+
+PHASE 11: TESTING & OPTIMIZATION
+==================================
+
+Step 11.1: Comprehensive Testing
+- [ ] Run all unit tests (target: 80%+ coverage)
+- [ ] Run all integration tests
+- [ ] Run all E2E tests
+- [ ] Fix any failing tests
+- [ ] Generate test coverage report
+- [ ] Identify gaps in test coverage
+- [ ] Add missing tests
+
+Step 11.2: Performance Optimization
+- [ ] Profile ad serving endpoint (target: < 100ms)
+- [ ] Optimize database queries (add indexes)
+- [ ] Optimize Redis caching (increase hit rate)
+- [ ] Optimize smart contract gas usage
+- [ ] Load test ad serving (target: 1M requests/day)
+- [ ] Optimize based on load test results
+
+Step 11.3: Security Audit
+- [ ] Review smart contracts for vulnerabilities
+- [ ] Review API endpoints for security issues
+- [ ] Review authentication/authorization
+- [ ] Review fraud detection logic
+- [ ] Fix identified security issues
+
+Step 11.4: Documentation
+- [ ] Write API documentation (OpenAPI/Swagger)
+- [ ] Write integration guide for publishers
+- [ ] Write integration guide for advertisers
+- [ ] Write developer documentation
+- [ ] Write deployment guide
+
+PHASE 12: DEPLOYMENT
+=====================
+
+Step 12.1: Infrastructure Setup
+- [ ] Setup production database (AWS RDS)
+- [ ] Setup production Redis (AWS ElastiCache)
+- [ ] Setup production environment variables
+- [ ] Setup CI/CD pipeline (GitHub Actions)
+- [ ] Setup monitoring (Sentry, DataDog)
+- [ ] Setup logging (CloudWatch)
+
+Step 12.2: Smart Contract Deployment
+- [ ] Deploy contracts to BASE mainnet
+- [ ] Verify contracts on BaseScan
+- [ ] Test contracts on mainnet
+- [ ] Setup contract monitoring (Tenderly)
+
+Step 12.3: Application Deployment
+- [ ] Deploy backend to production (AWS ECS / Kubernetes)
+- [ ] Deploy frontend to production (Vercel / AWS)
+- [ ] Setup CDN (Cloudflare)
+- [ ] Setup IPFS pinning service
+- [ ] Test production deployment
+- [ ] Monitor production metrics
+
+Step 12.4: Launch Preparation
+- [ ] Final security audit
+- [ ] Load testing in production-like environment
+- [ ] Prepare launch documentation
+- [ ] Prepare user onboarding materials
+- [ ] Setup support system (Discord / email)
+
+3. MINIMALISTIC IMPLEMENTATION NOTES
+------------------------------------
+
+Priority Order:
+1. Core functionality first (registration, campaigns, ad serving)
+2. Basic analytics (earnings, spend)
+3. Payment settlement (basic, then optimize)
+4. Advanced features (fraud detection, quality scoring)
+
+MVP Scope (First Release):
+- Publisher registration + domain verification (basic)
+- Advertiser registration + campaign creation
+- Basic ad serving (X402, banner format only)
+- Basic tracking (impressions, clicks)
+- Basic analytics (earnings, spend)
+- Basic payment settlement (daily, ETH only)
+- Smart contracts (PaymentEscrow, PublisherPayout)
+
+Defer to Later:
+- Advanced fraud detection (ML models)
+- Video ad formats
+- Native ad formats
+- Advanced targeting
+- BUZZ token integration (start with ETH/USDC)
+- Oracle integration (optional premium feature)
+- Governance features
+- Staking mechanisms
+
+4. TESTING STRATEGY
+-------------------
+
+Unit Tests:
+- Test individual functions in isolation
+- Mock external dependencies (database, Redis, contracts)
+- Target: 80%+ code coverage
+
+Integration Tests:
+- Test service interactions
+- Use test database
+- Test API endpoints end-to-end
+- Test smart contract interactions
+
+E2E Tests:
+- Test complete user journeys
+- Use headless browser (Playwright)
+- Test wallet integration
+- Test ad serving flow
+
+Smart Contract Tests:
+- Test all contract functions
+- Test edge cases
+- Test gas optimization
+- Test security (reentrancy, overflow)
+
+5. ITERATION APPROACH
+---------------------
+
+Each Phase:
+1. Write tests first
+2. Implement minimal code to pass tests
+3. Run tests, fix failures
+4. Refactor if needed
+5. Move to next step
+
+After Each Phase:
+- Review code quality
+- Check test coverage
+- Optimize if needed
+- Document changes
+
+Continuous:
+- Run tests on every commit (CI)
+- Monitor performance metrics
+- Gather user feedback (when available)
+- Iterate based on learnings
+

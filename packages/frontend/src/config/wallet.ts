@@ -1,0 +1,33 @@
+/**
+ * Wallet Configuration for BASE Network
+ * Using wagmi + viem for wallet connections
+ */
+
+import { createConfig, http } from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
+import { coinbaseWallet, metaMask, walletConnect } from 'wagmi/connectors';
+
+// Determine which network to use based on environment
+const network = process.env.NEXT_PUBLIC_BASE_NETWORK || 'base-sepolia';
+const chains = network === 'base-mainnet' ? [base] as const : [baseSepolia, base] as const;
+
+export const wagmiConfig = createConfig({
+  chains,
+  connectors: [
+    metaMask(),
+    coinbaseWallet({
+      appName: 'Buzzer Network',
+    }),
+    walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '',
+    }),
+  ],
+  transports: {
+    [baseSepolia.id]: http(),
+    [base.id]: http(),
+  },
+});
+
+// Export chain configuration
+export { chains };
+

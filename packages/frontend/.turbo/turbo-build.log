@@ -1,0 +1,296 @@
+
+> @buzzer-network/frontend@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.33
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings
+
+../../node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+Module not found: Can't resolve '@react-native-async-storage/async-storage' in '/Users/yogeba/Code/Buzz Network/node_modules/@metamask/sdk/dist/browser/es'
+
+Import trace for requested module:
+../../node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+../../node_modules/@wagmi/connectors/dist/esm/metaMask.js
+../../node_modules/@wagmi/connectors/dist/esm/exports/index.js
+../../node_modules/wagmi/dist/esm/exports/connectors.js
+./src/config/wallet.ts
+./src/app/providers.tsx
+
+../../node_modules/@walletconnect/logger/node_modules/pino/lib/tools.js
+Module not found: Can't resolve 'pino-pretty' in '/Users/yogeba/Code/Buzz Network/node_modules/@walletconnect/logger/node_modules/pino/lib'
+
+Import trace for requested module:
+../../node_modules/@walletconnect/logger/node_modules/pino/lib/tools.js
+../../node_modules/@walletconnect/logger/node_modules/pino/pino.js
+../../node_modules/@walletconnect/logger/dist/index.es.js
+../../node_modules/@walletconnect/universal-provider/dist/index.es.js
+../../node_modules/@walletconnect/ethereum-provider/dist/index.es.js
+../../node_modules/@wagmi/connectors/dist/esm/walletConnect.js
+../../node_modules/@wagmi/connectors/dist/esm/exports/index.js
+../../node_modules/wagmi/dist/esm/exports/connectors.js
+./src/config/wallet.ts
+./src/app/providers.tsx
+
+ ⚠ Compiled with warnings
+
+../../node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+Module not found: Can't resolve '@react-native-async-storage/async-storage' in '/Users/yogeba/Code/Buzz Network/node_modules/@metamask/sdk/dist/browser/es'
+
+Import trace for requested module:
+../../node_modules/@metamask/sdk/dist/browser/es/metamask-sdk.js
+../../node_modules/@wagmi/connectors/dist/esm/metaMask.js
+../../node_modules/@wagmi/connectors/dist/esm/exports/index.js
+../../node_modules/wagmi/dist/esm/exports/connectors.js
+./src/config/wallet.ts
+./src/app/providers.tsx
+
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/11) ...
+   Generating static pages (2/11) 
+Project ID Not Configured - update configuration on cloud.reown.com
+[Reown Config] Failed to fetch remote project configuration. Using local/default values. Error: HTTP status code: 403
+    at i (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102004)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async s.get (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102230)
+    at async Object.fetchProjectConfig (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:33366)
+    at async Object.fetchRemoteFeatures (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:230694)
+    at async h9.initialize (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:235692) {
+  [cause]: Response {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: Headers {
+      date: 'Tue, 04 Nov 2025 18:37:56 GMT',
+      'content-type': 'text/plain; charset=UTF-8',
+      'content-length': '9',
+      connection: 'keep-alive',
+      'cf-ray': '999639babd4d8f95-KNU',
+      'access-control-allow-origin': '*',
+      'cache-control': 'public, max-age=300, s-maxage=300',
+      vary: 'Accept-Encoding',
+      server: 'cloudflare',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+    bodyUsed: false,
+    ok: false,
+    redirected: false,
+    type: 'default',
+    url: 'https://api.web3modal.org/appkit/v1/config?st=appkit&sv=html-core-1.7.8'
+  }
+}
+Project ID Not Configured - update configuration on cloud.reown.com
+[Reown Config] Failed to fetch remote project configuration. Using local/default values. Error: HTTP status code: 403
+    at i (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102004)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async s.get (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102230)
+    at async Object.fetchProjectConfig (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:33366)
+    at async Object.fetchRemoteFeatures (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:230694)
+    at async h9.initialize (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:235692) {
+  [cause]: Response {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: Headers {
+      date: 'Tue, 04 Nov 2025 18:37:56 GMT',
+      'content-type': 'text/plain; charset=UTF-8',
+      'content-length': '9',
+      connection: 'keep-alive',
+      'cf-ray': '999639baabc37a00-PAT',
+      'access-control-allow-origin': '*',
+      'cache-control': 'public, max-age=300, s-maxage=300',
+      vary: 'Accept-Encoding',
+      server: 'cloudflare',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+    bodyUsed: false,
+    ok: false,
+    redirected: false,
+    type: 'default',
+    url: 'https://api.web3modal.org/appkit/v1/config?st=appkit&sv=html-core-1.7.8'
+  }
+}
+Project ID Not Configured - update configuration on cloud.reown.com
+[Reown Config] Failed to fetch remote project configuration. Using local/default values. Error: HTTP status code: 403
+    at i (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102004)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async s.get (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102230)
+    at async Object.fetchProjectConfig (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:33366)
+    at async Object.fetchRemoteFeatures (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:230694)
+    at async h9.initialize (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:235692) {
+  [cause]: Response {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: Headers {
+      date: 'Tue, 04 Nov 2025 18:37:56 GMT',
+      'content-type': 'text/plain; charset=UTF-8',
+      'content-length': '9',
+      connection: 'keep-alive',
+      'cf-ray': '999639baa9fc7a01-PAT',
+      'access-control-allow-origin': '*',
+      'cache-control': 'public, max-age=300, s-maxage=300',
+      vary: 'Accept-Encoding',
+      server: 'cloudflare',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+    bodyUsed: false,
+    ok: false,
+    redirected: false,
+    type: 'default',
+    url: 'https://api.web3modal.org/appkit/v1/config?st=appkit&sv=html-core-1.7.8'
+  }
+}
+Project ID Not Configured - update configuration on cloud.reown.com
+[Reown Config] Failed to fetch remote project configuration. Using local/default values. Error: HTTP status code: 403
+    at i (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102004)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async s.get (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102230)
+    at async Object.fetchProjectConfig (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:33366)
+    at async Object.fetchRemoteFeatures (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:230694)
+    at async h9.initialize (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:235692) {
+  [cause]: Response {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: Headers {
+      date: 'Tue, 04 Nov 2025 18:37:56 GMT',
+      'content-type': 'text/plain; charset=UTF-8',
+      'content-length': '9',
+      connection: 'keep-alive',
+      'cf-ray': '999639baafce8fb6-KNU',
+      'access-control-allow-origin': '*',
+      'cache-control': 'public, max-age=300, s-maxage=300',
+      vary: 'Accept-Encoding',
+      server: 'cloudflare',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+    bodyUsed: false,
+    ok: false,
+    redirected: false,
+    type: 'default',
+    url: 'https://api.web3modal.org/appkit/v1/config?st=appkit&sv=html-core-1.7.8'
+  }
+}
+Project ID Not Configured - update configuration on cloud.reown.com
+[Reown Config] Failed to fetch remote project configuration. Using local/default values. Error: HTTP status code: 403
+    at i (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102004)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async s.get (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102230)
+    at async Object.fetchProjectConfig (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:33366)
+    at async Object.fetchRemoteFeatures (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:230694)
+    at async h9.initialize (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:235692) {
+  [cause]: Response {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: Headers {
+      date: 'Tue, 04 Nov 2025 18:37:56 GMT',
+      'content-type': 'text/plain; charset=UTF-8',
+      'content-length': '9',
+      connection: 'keep-alive',
+      'cf-ray': '999639baafd47a2b-PAT',
+      'access-control-allow-origin': '*',
+      'cache-control': 'public, max-age=300, s-maxage=300',
+      vary: 'Accept-Encoding',
+      server: 'cloudflare',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+    bodyUsed: false,
+    ok: false,
+    redirected: false,
+    type: 'default',
+    url: 'https://api.web3modal.org/appkit/v1/config?st=appkit&sv=html-core-1.7.8'
+  }
+}
+Project ID Not Configured - update configuration on cloud.reown.com
+[Reown Config] Failed to fetch remote project configuration. Using local/default values. Error: HTTP status code: 403
+    at i (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102004)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async s.get (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102230)
+    at async Object.fetchProjectConfig (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:33366)
+    at async Object.fetchRemoteFeatures (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:230694)
+    at async h9.initialize (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:235692) {
+  [cause]: Response {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: Headers {
+      date: 'Tue, 04 Nov 2025 18:37:56 GMT',
+      'content-type': 'text/plain; charset=UTF-8',
+      'content-length': '9',
+      connection: 'keep-alive',
+      'cf-ray': '999639baa94d7a07-PAT',
+      'access-control-allow-origin': '*',
+      'cache-control': 'public, max-age=300, s-maxage=300',
+      vary: 'Accept-Encoding',
+      server: 'cloudflare',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+    bodyUsed: false,
+    ok: false,
+    redirected: false,
+    type: 'default',
+    url: 'https://api.web3modal.org/appkit/v1/config?st=appkit&sv=html-core-1.7.8'
+  }
+}
+Project ID Not Configured - update configuration on cloud.reown.com
+[Reown Config] Failed to fetch remote project configuration. Using local/default values. Error: HTTP status code: 403
+    at i (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102004)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async s.get (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:102230)
+    at async Object.fetchProjectConfig (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:1:33366)
+    at async Object.fetchRemoteFeatures (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:230694)
+    at async h9.initialize (/Users/yogeba/Code/Buzz Network/packages/frontend/.next/server/chunks/503.js:894:235692) {
+  [cause]: Response {
+    status: 403,
+    statusText: 'Forbidden',
+    headers: Headers {
+      date: 'Tue, 04 Nov 2025 18:37:56 GMT',
+      'content-type': 'text/plain; charset=UTF-8',
+      'content-length': '9',
+      connection: 'keep-alive',
+      'cf-ray': '999639bab84da75c-IXC',
+      'access-control-allow-origin': '*',
+      'cache-control': 'public, max-age=300, s-maxage=300',
+      vary: 'Accept-Encoding',
+      server: 'cloudflare',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    body: ReadableStream { locked: false, state: 'readable', supportsBYOB: true },
+    bodyUsed: false,
+    ok: false,
+    redirected: false,
+    type: 'default',
+    url: 'https://api.web3modal.org/appkit/v1/config?st=appkit&sv=html-core-1.7.8'
+  }
+}
+   Generating static pages (5/11) 
+   Generating static pages (8/11) 
+ ✓ Generating static pages (11/11)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    1.3 kB          117 kB
+├ ○ /_not-found                          880 B          89.8 kB
+├ ○ /advertisers                         4.35 kB         121 kB
+├ ○ /advertisers/campaigns               1.95 kB         103 kB
+├ ƒ /advertisers/campaigns/[id]          37.7 kB         165 kB
+├ ○ /advertisers/campaigns/new           3.8 kB          110 kB
+├ ○ /dashboard                           1.94 kB        94.1 kB
+├ ○ /publishers                          4.44 kB         121 kB
+├ ○ /publishers/dashboard                2.38 kB        94.6 kB
+└ ○ /publishers/verify                   2.7 kB         94.9 kB
++ First Load JS shared by all            88.9 kB
+  ├ chunks/1528-e7e6eb9baceb4349.js      31.8 kB
+  ├ chunks/1dd3208c-428bc8a46879a61e.js  53.6 kB
+  └ other shared chunks (total)          3.46 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

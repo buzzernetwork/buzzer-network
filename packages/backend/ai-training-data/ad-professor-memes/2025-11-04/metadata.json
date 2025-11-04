@@ -1,0 +1,19 @@
+{
+  "source": "adprofessor.com",
+  "scrapedAt": "2025-11-04T18:40:05.571Z",
+  "totalMemes": 1,
+  "categories": {
+    "memes": 1
+  },
+  "memes": [
+    {
+      "id": "meme-31-1762281584018",
+      "filename": "ad-professor-memes/2025-11-04/memes/ad_professor_65a15fd8127949ff6dd4_1762281584018.webp",
+      "title": "Meme 32",
+      "category": "memes",
+      "sourceUrl": "https://www.adprofessor.com",
+      "imageUrl": "https://cdn.prod.website-files.com/65758b01be0a3d2c4be76e83/65a15fd8127949ff6dd457b9_tiktok-6338430_1280.webp",
+      "timestamp": "2025-11-04T18:39:44.018Z"
+    }
+  ]
+}

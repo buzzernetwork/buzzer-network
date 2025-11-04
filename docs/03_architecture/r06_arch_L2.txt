@@ -1,0 +1,639 @@
+ARCHITECTURE LEVEL 2 - GRANULAR SYSTEM ARCHITECTURE
+=====================================================
+
+Consistency References:
+- L1 Architecture (r05): High-level layers, components, data flows
+- PRD v2 (r04): Detailed functional requirements, user journeys
+- Domain Analysis (r02): Technical patterns, blockchain integration, X402 protocol
+
+1. DETAILED COMPONENT BREAKDOWN
+--------------------------------
+
+A. FRONTEND ARCHITECTURE
+-------------------------
+
+A1. Publisher Dashboard (Next.js App)
+├── Pages:
+│   ├── /dashboard (overview)
+│   ├── /dashboard/sites (website management)
+│   ├── /dashboard/earnings (earnings & payments)
+│   ├── /dashboard/analytics (performance metrics)
+│   ├── /dashboard/settings (account settings)
+│   └── /onboarding (registration & verification)
+├── Components:
+│   ├── SiteList (website management)
+│   ├── EarningsChart (revenue visualization)
+│   ├── IntegrationCodeGenerator (X402 script)
+│   ├── PaymentHistory (transaction list)
+│   ├── QualityScoreDisplay (publisher quality)
+│   └── WalletConnection (MetaMask/WalletConnect)
+└── State Management:
+    ├── Zustand stores (publisher data, earnings)
+    ├── React Query (API data fetching)
+    └── Wallet state (ethers.js/wagmi)
+
+A2. Advertiser Dashboard (Next.js App)
+├── Pages:
+│   ├── /dashboard (campaign overview)
+│   ├── /campaigns (campaign list)
+│   ├── /campaigns/new (campaign builder)
+│   ├── /campaigns/:id (campaign details)
+│   ├── /analytics (performance analytics)
+│   ├── /billing (budget management)
+│   └── /settings (account settings)
+├── Components:
+│   ├── CampaignCard (campaign summary)
+│   ├── CampaignBuilder (wizard form)
+│   ├── CreativeUploader (ad creative management)
+│   ├── TargetingSelector (geo, category, quality)
+│   ├── BudgetManager (budget controls)
+│   ├── PerformanceChart (metrics visualization)
+│   └── WalletFunding (token funding)
+└── State Management:
+    ├── Zustand stores (campaigns, budgets)
+    ├── React Query (API data fetching)
+    └── Wallet state (ethers.js/wagmi)
+
+A3. Landing Pages (Marketing Site)
+├── Pages:
+│   ├── / (homepage)
+│   ├── /publishers (publisher landing)
+│   ├── /advertisers (advertiser landing)
+│   ├── /about (company info)
+│   └── /docs (documentation)
+└── Features:
+    ├── Wallet connection demo
+    ├── ROI calculator
+    ├── Integration code preview
+    └── FAQ section
+
+B. BACKEND SERVICES ARCHITECTURE
+---------------------------------
+
+B1. API Gateway Service
+├── Technology: Express.js / Fastify
+├── Responsibilities:
+│   ├── Request routing (to microservices)
+│   ├── Authentication (JWT + wallet signature)
+│   ├── Rate limiting (per IP, per wallet)
+│   ├── Request validation (schema validation)
+│   ├── CORS handling
+│   └── Request logging
+├── Endpoints:
+│   ├── /api/v1/publishers/* (publisher routes)
+│   ├── /api/v1/advertisers/* (advertiser routes)
+│   ├── /api/v1/campaigns/* (campaign routes)
+│   ├── /api/v1/ads/* (ad serving - X402)
+│   ├── /api/v1/tracking/* (impression/click)
+│   └── /api/v1/analytics/* (analytics queries)
+└── Middleware:
+    ├── auth.middleware (wallet verification)
+    ├── rateLimit.middleware
+    ├── validation.middleware
+    └── errorHandler.middleware
+
+B2. Publisher Service
+├── Technology: Node.js + TypeScript + Express
+├── Database: PostgreSQL (publishers table)
+├── Responsibilities:
+│   ├── Publisher registration
+│   ├── Domain verification
+│   ├── Quality scoring
+│   ├── Integration code generation
+│   ├── Earnings calculation
+│   └── Payment history
+├── Key Functions:
+│   ├── registerPublisher(wallet, email, websiteUrl)
+│   ├── verifyDomain(publisherId, verificationMethod)
+│   ├── calculateQualityScore(websiteUrl, trafficData)
+│   ├── generateIntegrationCode(publisherId, slotId, format)
+│   ├── getEarnings(publisherId, dateRange)
+│   └── requestWithdrawal(publisherId, amount, token)
+├── External Calls:
+│   ├── Domain verification API (DNS lookup)
+│   ├── Traffic audit service
+│   ├── Content moderation API
+│   └── Smart contract (payout requests)
+
+B3. Advertiser Service
+├── Technology: Node.js + TypeScript + Express
+├── Database: PostgreSQL (advertisers, campaigns tables)
+├── Responsibilities:
+│   ├── Advertiser registration
+│   ├── Campaign CRUD operations
+│   ├── Creative management
+│   ├── Budget management
+│   └── Campaign analytics
+├── Key Functions:
+│   ├── registerAdvertiser(wallet, companyInfo)
+│   ├── createCampaign(advertiserId, campaignData)
+│   ├── uploadCreative(campaignId, file, metadata)
+│   ├── fundCampaign(campaignId, amount, token)
+│   ├── updateCampaign(campaignId, updates)
+│   └── getCampaignAnalytics(campaignId, dateRange)
+├── External Calls:
+│   ├── IPFS (creative upload)
+│   ├── CDN (creative URL generation)
+│   ├── Smart contract (escrow operations)
+│   └── Analytics service (performance data)
+
+B4. Ad Serving Service (X402 Compliant)
+├── Technology: Node.js + TypeScript + Fastify (low latency)
+├── Database: Redis (campaign cache), PostgreSQL (campaign data)
+├── X402 SDK: Use x402-sdk for middleware integration
+├── Responsibilities:
+│   ├── X402 protocol endpoint handling
+│   ├── HTTP 402 status code implementation
+│   ├── X402 middleware integration
+│   ├── Ad request processing
+│   ├── Matching engine execution
+│   ├── Ad selection (bid-based)
+│   └── Ad response formatting
+├── X402 Protocol Implementation:
+│   ├── HTTP 402 Status Code: Return 402 "Payment Required" when appropriate
+│   ├── X402 Middleware: Use x402-sdk middleware (single line integration)
+│   ├── Payment Flow: Handle payment requests via X402 protocol
+│   ├── Wallet Integration: Support wallet-based payments (no registration)
+│   └── Instant Settlement: Process payments at blockchain speed
+├── X402 Endpoint: GET /x402/ad
+│   Query Params:
+│   ├── pub_id (publisher ID)
+│   ├── slot_id (ad slot ID)
+│   ├── format (banner/native/video)
+│   ├── geo (country code - optional)
+│   └── device (desktop/mobile/tablet - optional)
+│   X402 Headers:
+│   ├── X-402-Payment-Required (if payment needed)
+│   └── X-402-Payment-Address (wallet address for payment)
+├── Response Format (X402 Standard):
+│   Success (200 OK):
+│   {
+│     "ad_id": "AD_XXX",
+│     "creative_url": "https://cdn.buzzer.network/...",
+│     "format": "banner",
+│     "width": 300,
+│     "height": 250,
+│     "click_url": "https://buzzer.network/track/click/...",
+│     "impression_url": "https://buzzer.network/track/imp/..."
+│   }
+│   Payment Required (402 Payment Required):
+│   {
+│     "error": "Payment Required",
+│     "payment_address": "0x...",
+│     "amount": "0.001",
+│     "token": "ETH",
+│     "x402_payment_url": "https://buzzer.network/pay/..."
+│   }
+├── Key Functions:
+│   ├── handleAdRequest(params) // X402-compliant handler
+│   ├── handleX402Payment(paymentRequest) // Process X402 payment
+│   ├── matchCampaigns(publisherId, targetingParams)
+│   ├── selectBestAd(campaigns, bids)
+│   ├── formatAdResponse(adCreative, campaignId)
+│   └── cacheAdResponse(cacheKey, response)
+├── X402 Middleware Integration:
+│   ├── Use x402-sdk middleware
+│   ├── Example: app.use(x402Middleware({ chain: 'base', ... }))
+│   ├── Automatic payment handling
+│   ├── Wallet connection support
+│   └── Payment verification
+├── Performance Requirements:
+│   ├── Response time: < 100ms (P95)
+│   ├── Cache hit rate: > 80%
+│   ├── Redis for campaign matching cache
+│   └── CDN for creative delivery
+
+B5. Matching Engine
+├── Technology: Node.js + TypeScript (optimized algorithms)
+├── Database: Redis (active campaigns cache), PostgreSQL
+├── Responsibilities:
+│   ├── Real-time campaign matching
+│   ├── Bid-based ranking
+│   ├── Budget availability checking
+│   └── Fair distribution algorithm
+├── Matching Algorithm:
+│   1. Fetch active campaigns from cache (Redis)
+│   2. Filter by targeting:
+│      - Geographic match (country)
+│      - Publisher category match
+│      - Publisher quality score >= campaign requirement
+│      - Device type match
+│      - Budget available > 0
+│   3. Rank by bid amount (highest first)
+│   4. Apply fair distribution (rotate if same bid)
+│   5. Return top N campaigns (default: 1)
+├── Key Functions:
+│   ├── matchCampaigns(publisherId, geo, category, device)
+│   ├── filterByTargeting(campaigns, params)
+│   ├── rankByBid(campaigns)
+│   ├── checkBudgetAvailability(campaignId)
+│   └── applyFairDistribution(rankedCampaigns)
+├── Caching Strategy:
+│   ├── Active campaigns cached in Redis (5min TTL)
+│   ├── Campaign targeting cached (10min TTL)
+│   ├── Budget availability cached (1min TTL)
+│   └── Invalidate on campaign updates
+
+B6. Tracking Service
+├── Technology: Node.js + TypeScript + Fastify
+├── Database: TimescaleDB (impressions, clicks tables)
+├── Responsibilities:
+│   ├── Impression event logging
+│   ├── Click event logging
+│   ├── Fraud detection
+│   ├── Event verification
+│   └── Real-time analytics updates
+├── Endpoints:
+│   ├── POST /track/impression
+│   │   Body: { ad_id, pub_id, campaign_id, timestamp, ... }
+│   └── GET /track/click/:trackingId
+│       Redirects to advertiser landing page
+├── Fraud Detection:
+│   ├── Bot detection (User-Agent, IP analysis)
+│   ├── Duplicate prevention (idempotency keys)
+│   ├── Rate limiting (per IP, per publisher)
+│   ├── Invalid traffic patterns
+│   └── ML model scoring (optional)
+├── Key Functions:
+│   ├── logImpression(eventData)
+│   ├── logClick(trackingId, eventData)
+│   ├── detectFraud(eventData)
+│   ├── verifyEvent(eventData)
+│   └── updateAnalytics(publisherId, campaignId, eventType)
+├── Data Pipeline:
+│   Events → Validation → Fraud Check → TimescaleDB → Analytics Update
+
+B7. Analytics Service
+├── Technology: Node.js + TypeScript + Express
+├── Database: TimescaleDB (time-series), PostgreSQL (aggregated)
+├── Responsibilities:
+│   ├── Performance metrics calculation
+│   ├── Dashboard data aggregation
+│   ├── Report generation
+│   └── Real-time analytics queries
+├── Key Metrics:
+│   ├── Impressions (total, by day, by campaign)
+│   ├── Clicks (total, CTR)
+│   ├── Earnings (for publishers)
+│   ├── Spend (for advertisers)
+│   ├── Performance trends
+│   └── Top performers
+├── Key Functions:
+│   ├── getPublisherAnalytics(publisherId, dateRange)
+│   ├── getCampaignAnalytics(campaignId, dateRange)
+│   ├── getNetworkAnalytics(dateRange)
+│   ├── aggregateMetrics(rawData, grouping)
+│   └── generateReport(params)
+├── Performance:
+│   ├── Pre-aggregated data (hourly/daily)
+│   ├── Materialized views (PostgreSQL)
+│   ├── Cache frequently accessed queries (Redis)
+│   └── Real-time queries for recent data (TimescaleDB)
+
+B8. Payment Service
+├── Technology: Node.js + TypeScript + Express
+├── Database: PostgreSQL (settlements table)
+├── Blockchain: Smart contract interaction (ethers.js)
+├── Responsibilities:
+│   ├── Earnings aggregation
+│   ├── Settlement job execution
+│   ├── Smart contract payment execution
+│   ├── Transaction monitoring
+│   └── Payment history management
+├── Settlement Flow:
+│   1. Daily cron job triggers (configurable time)
+│   2. Aggregate impressions/clicks from last 24h
+│   3. Calculate earnings per publisher:
+│      - Impressions × CPM / 1000
+│      - Clicks × CPC
+│      - Apply 85/15 revenue share
+│   4. Group by publisher and token type
+│   5. Execute batch payments via smart contract
+│   6. Update on-chain records
+│   7. Notify publishers (optional)
+├── Key Functions:
+│   ├── aggregateEarnings(dateRange)
+│   ├── calculatePublisherEarnings(publisherId, impressions, clicks)
+│   ├── executeBatchPayout(payments)
+│   ├── monitorTransaction(txHash)
+│   └── getPaymentHistory(publisherId)
+├── Smart Contract Integration:
+│   ├── PaymentEscrow contract (advertiser budgets)
+│   ├── PublisherPayout contract (publisher earnings)
+│   ├── Batch transaction optimization
+│   └── Gas estimation and optimization
+
+C. SMART CONTRACT ARCHITECTURE
+-------------------------------
+
+C1. PaymentEscrow.sol
+├── Purpose: Hold advertiser campaign budgets
+├── Functions:
+│   ├── deposit(uint256 campaignId, uint256 amount, address token)
+│   ├── withdraw(uint256 campaignId, uint256 amount, address token)
+│   ├── spend(uint256 campaignId, uint256 amount, address token)
+│   ├── getBalance(uint256 campaignId, address token) → uint256
+│   └── getTotalSpent(uint256 campaignId, address token) → uint256
+├── Events:
+│   ├── Deposited(campaignId, amount, token)
+│   ├── Withdrawn(campaignId, amount, token)
+│   └── Spent(campaignId, amount, token)
+├── Security:
+│   ├── Only campaign owner can deposit/withdraw
+│   ├── Only authorized backend can spend
+│   ├── Reentrancy protection
+│   └── Overflow protection
+
+C2. PublisherPayout.sol
+├── Purpose: Execute publisher earnings payouts
+├── Functions:
+│   ├── payout(address publisher, uint256 amount, address token)
+│   ├── batchPayout(Payout[] payouts)
+│   ├── getPendingEarnings(address publisher, address token) → uint256
+│   └── getTotalPaid(address publisher, address token) → uint256
+├── Events:
+│   ├── Paid(publisher, amount, token, txHash)
+│   └── BatchPaid(payouts[])
+├── Security:
+│   ├── Only authorized backend can execute payouts
+│   ├── Multi-sig for large amounts (optional)
+│   ├── Batch optimization (gas savings)
+│   └── Reentrancy protection
+
+C3. PublisherRegistry.sol
+├── Purpose: Store publisher on-chain identity and metadata
+├── Functions:
+│   ├── register(address wallet, string pubId, address paymentWallet)
+│   ├── updatePaymentWallet(address publisher, address newWallet)
+│   ├── getPublisher(address wallet) → Publisher
+│   └── isRegistered(address wallet) → bool
+├── Events:
+│   ├── Registered(publisher, pubId)
+│   └── PaymentWalletUpdated(publisher, newWallet)
+├── Data Structure:
+│   struct Publisher {
+│     address wallet;
+│     string pubId;
+│     address paymentWallet;
+│     uint256 qualityScore; // Optional on-chain
+│     uint256 registeredAt;
+│   }
+
+C4. CampaignRegistry.sol
+├── Purpose: Store campaign metadata on-chain (optional)
+├── Functions:
+│   ├── register(uint256 campaignId, address advertiser, CampaignData data)
+│   ├── updateStatus(uint256 campaignId, bool active)
+│   ├── getCampaign(uint256 campaignId) → Campaign
+│   └── isActive(uint256 campaignId) → bool
+├── Events:
+│   ├── CampaignRegistered(campaignId, advertiser)
+│   └── CampaignStatusUpdated(campaignId, active)
+├── Note: Can be minimal for MVP (optional component)
+
+D. DATABASE SCHEMA (PostgreSQL)
+--------------------------------
+
+D1. Core Tables
+├── publishers
+│   ├── id (UUID, PK)
+│   ├── wallet_address (VARCHAR, UNIQUE)
+│   ├── email (VARCHAR, nullable)
+│   ├── website_url (VARCHAR)
+│   ├── domain_verified (BOOLEAN)
+│   ├── quality_score (INTEGER)
+│   ├── status (ENUM: pending, approved, rejected, suspended)
+│   ├── payment_wallet (VARCHAR)
+│   ├── created_at (TIMESTAMP)
+│   └── updated_at (TIMESTAMP)
+├── advertisers
+│   ├── id (UUID, PK)
+│   ├── wallet_address (VARCHAR, UNIQUE)
+│   ├── company_name (VARCHAR)
+│   ├── website_url (VARCHAR)
+│   ├── status (ENUM: active, suspended)
+│   ├── created_at (TIMESTAMP)
+│   └── updated_at (TIMESTAMP)
+├── campaigns
+│   ├── id (UUID, PK)
+│   ├── advertiser_id (UUID, FK)
+│   ├── name (VARCHAR)
+│   ├── objective (ENUM: awareness, clicks, conversions)
+│   ├── bid_model (ENUM: CPM, CPC)
+│   ├── bid_amount (DECIMAL)
+│   ├── total_budget (DECIMAL)
+│   ├── daily_budget (DECIMAL, nullable)
+│   ├── spent_budget (DECIMAL)
+│   ├── status (ENUM: draft, active, paused, ended)
+│   ├── targeting (JSONB) -- { geo, categories, quality_min, devices }
+│   ├── creative_url (VARCHAR) -- IPFS/CDN URL
+│   ├── creative_format (ENUM: banner, native, video)
+│   ├── landing_page_url (VARCHAR)
+│   ├── start_date (TIMESTAMP, nullable)
+│   ├── end_date (TIMESTAMP, nullable)
+│   ├── created_at (TIMESTAMP)
+│   └── updated_at (TIMESTAMP)
+└── ad_slots
+    ├── id (UUID, PK)
+    ├── publisher_id (UUID, FK)
+    ├── slot_id (VARCHAR, UNIQUE)
+    ├── format (ENUM: banner, native, video)
+    ├── dimensions (VARCHAR) -- "300x250"
+    ├── status (ENUM: active, paused)
+    ├── created_at (TIMESTAMP)
+    └── updated_at (TIMESTAMP)
+
+D2. Analytics Tables (TimescaleDB)
+├── impressions (Hypertable)
+│   ├── id (UUID, PK)
+│   ├── ad_id (VARCHAR)
+│   ├── campaign_id (UUID)
+│   ├── publisher_id (UUID)
+│   ├── slot_id (VARCHAR)
+│   ├── timestamp (TIMESTAMP)
+│   ├── geo (VARCHAR) -- country code
+│   ├── device (VARCHAR)
+│   ├── verified (BOOLEAN) -- fraud check result
+│   └── revenue (DECIMAL) -- calculated earnings
+├── clicks (Hypertable)
+│   ├── id (UUID, PK)
+│   ├── ad_id (VARCHAR)
+│   ├── campaign_id (UUID)
+│   ├── publisher_id (UUID)
+│   ├── slot_id (VARCHAR)
+│   ├── timestamp (TIMESTAMP)
+│   ├── geo (VARCHAR)
+│   ├── device (VARCHAR)
+│   ├── verified (BOOLEAN)
+│   ├── revenue (DECIMAL)
+│   └── converted (BOOLEAN) -- optional conversion tracking
+└── settlements
+    ├── id (UUID, PK)
+    ├── publisher_id (UUID)
+    ├── settlement_date (DATE)
+    ├── impressions_count (INTEGER)
+    ├── clicks_count (INTEGER)
+    ├── earnings_amount (DECIMAL)
+    ├── token_type (VARCHAR) -- ETH, USDC, BUZZ
+    ├── tx_hash (VARCHAR, nullable)
+    ├── status (ENUM: pending, completed, failed)
+    ├── created_at (TIMESTAMP)
+    └── paid_at (TIMESTAMP, nullable)
+
+D3. Indexes
+├── publishers: wallet_address (UNIQUE), website_url, status
+├── advertisers: wallet_address (UNIQUE)
+├── campaigns: advertiser_id, status, targeting (GIN index for JSONB)
+├── impressions: campaign_id, publisher_id, timestamp (time-series index)
+├── clicks: campaign_id, publisher_id, timestamp (time-series index)
+└── settlements: publisher_id, settlement_date, status
+
+E. INFRASTRUCTURE ARCHITECTURE
+-------------------------------
+
+E1. Deployment Topology
+├── Frontend:
+│   ├── Hosting: Vercel / AWS Amplify
+│   ├── CDN: Cloudflare
+│   └── Environment: Next.js static + serverless
+├── Backend:
+│   ├── Hosting: AWS ECS / Kubernetes
+│   ├── Load Balancer: AWS ALB
+│   ├── Auto-scaling: Based on ad request volume
+│   └── Environment: Docker containers
+├── Databases:
+│   ├── PostgreSQL: AWS RDS (Primary + Read Replicas)
+│   ├── TimescaleDB: AWS RDS (separate instance)
+│   └── Redis: AWS ElastiCache (cluster mode)
+├── Blockchain:
+│   ├── BASE Network: Mainnet
+│   ├── Smart Contracts: Deployed via Hardhat
+│   └── Monitoring: Tenderly / BaseScan
+└── Storage:
+    ├── IPFS: Pinata / Infura
+    ├── CDN: Cloudflare / AWS CloudFront
+    └── Backups: AWS S3
+
+E2. Monitoring & Observability
+├── Application Monitoring:
+│   ├── APM: DataDog / New Relic
+│   ├── Error Tracking: Sentry
+│   └── Logs: CloudWatch / DataDog Logs
+├── Infrastructure Monitoring:
+│   ├── Health Checks: Automated
+│   ├── Alerts: PagerDuty / Slack
+│   └── Dashboards: Grafana
+└── Blockchain Monitoring:
+    ├── Transaction Tracking: Tenderly
+    ├── Contract Events: The Graph (optional)
+    └── Gas Monitoring: Alerts on high gas
+
+F. SECURITY ARCHITECTURE
+-------------------------
+
+F1. Authentication Flow
+├── Wallet Connection:
+│   1. User clicks "Connect Wallet"
+│   2. Wallet provider (MetaMask) prompts signature
+│   3. Backend verifies signature (message = nonce + timestamp)
+│   4. Backend issues JWT token
+│   5. JWT used for subsequent API requests
+└── API Authentication:
+    ├── JWT in Authorization header
+    ├── Wallet signature for sensitive operations
+    ├── Rate limiting per wallet address
+    └── Session expiration (24h default)
+
+F2. Authorization
+├── Publisher Operations:
+│   ├── Only wallet owner can access publisher data
+│   ├── Smart contract verification for payouts
+│   └── Domain ownership verification for site management
+├── Advertiser Operations:
+│   ├── Only wallet owner can manage campaigns
+│   ├── Smart contract verification for funding
+│   └── Campaign ownership checks
+└── System Operations:
+    ├── Admin-only endpoints (settlement jobs)
+    ├── Backend service authentication (API keys)
+    └── Smart contract access control (multi-sig for critical)
+
+F3. Data Security
+├── Encryption:
+│   ├── Database: Encryption at rest (AWS RDS)
+│   ├── Network: TLS 1.3 for all connections
+│   └── Sensitive data: Encrypted fields (PII)
+├── Privacy:
+│   ├── No PII stored (wallet addresses only)
+│   ├── Analytics anonymization
+│   ├── GDPR compliance (data deletion)
+│   └── CCPA compliance (California users)
+
+G. SCALABILITY PATTERNS
+------------------------
+
+G1. Ad Serving Scalability
+├── Caching:
+│   ├── Campaign data in Redis (5min TTL)
+│   ├── Matching results cached (1min TTL)
+│   └── Ad responses cached (CDN)
+├── Load Distribution:
+│   ├── Geographic CDN distribution
+│   ├── Multiple ad serving instances
+│   └── Database read replicas for queries
+└── Performance:
+    ├── Async processing (non-blocking)
+    ├── Connection pooling
+    └── Optimized queries (indexed)
+
+G2. Settlement Scalability
+├── Batch Processing:
+│   ├── Daily settlement jobs (scheduled)
+│   ├── Batch smart contract calls (gas optimization)
+│   └── Queue system for large batches
+├── Optimization:
+│   ├── Group payments by token type
+│   ├── Group payments by publisher
+│   └── Gas-efficient contract design
+└── Monitoring:
+    ├── Settlement job monitoring
+    ├── Transaction success rates
+    └── Gas cost tracking
+
+H. ERROR HANDLING & RESILIENCE
+--------------------------------
+
+H1. Error Handling Strategy
+├── API Errors:
+│   ├── Standardized error responses
+│   ├── Error codes and messages
+│   ├── Retry logic for transient failures
+│   └── Circuit breakers for external services
+├── Smart Contract Errors:
+│   ├── Transaction failure handling
+│   ├── Gas estimation failures
+│   ├── Revert reason capture
+│   └── Fallback mechanisms
+└── Database Errors:
+    ├── Connection retry logic
+    ├── Query timeout handling
+    ├── Deadlock handling
+    └── Read replica failover
+
+H2. Resilience Patterns
+├── Redundancy:
+│   ├── Multiple backend instances
+│   ├── Database replicas
+│   ├── CDN failover
+│   └── IPFS + CDN fallback
+├── Failure Recovery:
+│   ├── Automatic retries
+│   ├── Graceful degradation
+│   ├── Fallback ad selection
+│   └── Queue-based processing
+└── Disaster Recovery:
+    ├── Database backups (daily)
+    ├── Smart contract backups (verified source code)
+    ├── Configuration backups
+    └── Recovery procedures documented
+

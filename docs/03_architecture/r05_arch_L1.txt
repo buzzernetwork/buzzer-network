@@ -1,0 +1,260 @@
+ARCHITECTURE LEVEL 1 - HIGH-LEVEL SYSTEM ARCHITECTURE
+======================================================
+
+Consistency References:
+- Domain Analysis (r02): Ad network patterns, blockchain integration, X402 protocol
+- PRD v2 (r04): Functional requirements, user journeys, technical constraints
+
+1. SYSTEM OVERVIEW
+------------------
+Buzzer Network follows a hybrid architecture: off-chain computation for performance (ad serving, matching) and on-chain execution for trustless payments and verification.
+
+Core Principle: Move fast (off-chain), settle securely (on-chain)
+
+2. ARCHITECTURAL LAYERS
+------------------------
+
+Layer 1: Presentation Layer (Frontend)
+- Publisher Dashboard (React/Next.js)
+- Advertiser Dashboard (React/Next.js)
+- Public Landing Pages (Marketing site)
+- Mobile-responsive design
+- Wallet integration (MetaMask, WalletConnect)
+
+Layer 2: Application Layer (Backend Services)
+- API Gateway (REST + GraphQL)
+- Publisher Service
+- Advertiser Service
+- Campaign Management Service
+- Ad Serving Service (X402 compliant)
+- Matching Engine
+- Analytics Service
+- Payment Service
+
+Layer 3: Data Layer
+- Primary Database (PostgreSQL - user data, campaigns, earnings)
+- Time-Series Database (TimescaleDB - analytics, impressions)
+- Cache Layer (Redis - ad serving performance)
+- File Storage (IPFS + CDN - ad creatives)
+
+Layer 4: Blockchain Layer
+- Smart Contracts (Solidity on BASE)
+  * Payment Escrow Contract
+  * Payout Contract
+  * Publisher Registry Contract
+  * Campaign Registry Contract
+- Oracle Service (Chainlink - impression verification)
+- Wallet Service (Wallet abstraction)
+
+Layer 5: Integration Layer
+- X402 Protocol Adapter
+- Oracle Integration
+- IPFS Integration
+- CDN Integration (Cloudflare/AWS)
+
+3. CORE COMPONENTS
+-------------------
+
+A. AD SERVING PIPELINE
+----------------------
+Flow: Ad Request → Matching → Ad Selection → Delivery → Tracking
+
+Components:
+1. Ad Request Handler (X402 compliant endpoint)
+2. Matching Engine (real-time campaign matching)
+3. Ad Selector (bid-based selection)
+4. Ad Delivery (creative URL return)
+5. Tracking Service (impression/click logging)
+
+B. PAYMENT PIPELINE
+--------------------
+Flow: Earnings Calculation → Settlement Job → Smart Contract Execution → On-Chain Record
+
+Components:
+1. Earnings Calculator (aggregates impressions/clicks)
+2. Settlement Service (batch processing)
+3. Smart Contract Interface (payment execution)
+4. Transaction Monitor (confirmation tracking)
+
+C. PUBLISHER PIPELINE
+---------------------
+Flow: Registration → Verification → Integration → Earnings → Payments
+
+Components:
+1. Publisher Onboarding Service
+2. Domain Verification Service
+3. Quality Scoring Service
+4. Integration Code Generator
+5. Earnings Tracker
+
+D. ADVERTISER PIPELINE
+----------------------
+Flow: Registration → Campaign Creation → Funding → Launch → Management
+
+Components:
+1. Advertiser Onboarding Service
+2. Campaign Builder Service
+3. Budget Management Service
+4. Creative Management Service
+5. Performance Analytics Service
+
+4. DATA FLOW ARCHITECTURE
+--------------------------
+
+Publisher → Network Flow:
+1. Publisher registers → Database
+2. Domain verified → Verification Service → Database
+3. Integration code added → Ad Script loads → Ad Request
+4. Ad Request → Matching Engine → Ad Selected → Display
+5. Impression Event → Tracking Service → Time-Series DB
+6. Earnings Calculated → Primary DB
+7. Settlement Job → Smart Contract → Payment → Publisher Wallet
+
+Advertiser → Network Flow:
+1. Advertiser registers → Database
+2. Campaign created → Database + Smart Contract (escrow)
+3. Budget funded → Smart Contract escrow
+4. Campaign live → Matching Engine considers campaign
+5. Ads served → Tracking Service logs → Advertiser budget deducted
+6. Performance Analytics → Dashboard
+
+5. BLOCKCHAIN INTEGRATION
+-------------------------
+
+Smart Contract Architecture:
+1. PaymentEscrow.sol
+   - Holds advertiser campaign budgets
+   - Tracks spending per campaign
+   - Enables withdrawals for unused funds
+
+2. PublisherPayout.sol
+   - Manages publisher earnings
+   - Executes batch payouts
+   - Records settlement history
+
+3. PublisherRegistry.sol
+   - Stores publisher on-chain identity
+   - Quality scores (optional on-chain)
+   - Payment wallet addresses
+
+4. CampaignRegistry.sol
+   - Stores campaign metadata (optional)
+   - Campaign status (active/paused)
+   - Budget allocations
+
+Oracle Integration:
+- Chainlink Oracle: Verifies impression/click events
+- Used for high-value settlements (optional premium feature)
+- Provides trustless verification for disputed transactions
+
+6. TECHNOLOGY STACK
+--------------------
+
+Frontend:
+- Framework: Next.js (React)
+- Styling: Tailwind CSS
+- Wallet: ethers.js / wagmi
+- State: Zustand / Redux
+
+Backend:
+- Runtime: Node.js
+- Framework: Express.js / Fastify
+- Language: TypeScript
+- API: REST + GraphQL (optional)
+
+Database:
+- Primary: PostgreSQL (user data, campaigns)
+- Analytics: TimescaleDB (time-series)
+- Cache: Redis (ad serving cache)
+
+Blockchain:
+- Chain: BASE (L2 Ethereum)
+- Smart Contracts: Solidity
+- Development: Hardhat / Foundry
+- Testing: Hardhat + Chai
+
+Infrastructure:
+- Hosting: AWS / Vercel (frontend)
+- CDN: Cloudflare
+- IPFS: Pinata / Infura
+- Monitoring: Sentry, DataDog
+
+7. SECURITY ARCHITECTURE
+------------------------
+
+Authentication:
+- Wallet signature verification (crypto-native)
+- JWT tokens for session management
+- API key authentication (for programmatic access - future)
+
+Authorization:
+- Role-based access control (Publisher, Advertiser, Admin)
+- Smart contract-based permissions (wallet ownership)
+
+Data Protection:
+- Encryption at rest (database)
+- Encryption in transit (TLS)
+- Private key never stored (wallet integration only)
+
+Fraud Prevention:
+- Rate limiting (API endpoints)
+- Bot detection (ML models)
+- Duplicate event prevention (idempotency keys)
+- Smart contract verification (on-chain records)
+
+8. SCALABILITY ARCHITECTURE
+---------------------------
+
+Horizontal Scaling:
+- Stateless API services (can scale horizontally)
+- Database read replicas (for analytics)
+- CDN for static assets (global distribution)
+
+Performance Optimization:
+- Redis caching (ad matching results, frequently accessed data)
+- Database indexing (optimized queries)
+- Batch processing (settlements, not real-time)
+- Connection pooling (database connections)
+
+Load Handling:
+- Auto-scaling (based on ad request volume)
+- Queue system (for settlement jobs)
+- Rate limiting (prevent abuse)
+
+9. DEPLOYMENT ARCHITECTURE
+---------------------------
+
+Environment Strategy:
+- Development (local)
+- Staging (testnet BASE)
+- Production (mainnet BASE)
+
+CI/CD:
+- GitHub Actions / GitLab CI
+- Automated testing (unit, integration)
+- Smart contract deployment pipeline
+- Database migrations
+
+Monitoring:
+- Application logs (structured logging)
+- Performance metrics (APM)
+- Blockchain monitoring (transaction tracking)
+- Error tracking (Sentry)
+
+10. INTEGRATION POINTS
+----------------------
+
+External Services:
+1. X402 Protocol: Ad serving standard compliance
+2. IPFS: Ad creative storage
+3. CDN: Fast creative delivery
+4. Oracle: Impression verification
+5. BASE Network: Blockchain execution
+6. Wallet Providers: MetaMask, WalletConnect
+
+API Design:
+- RESTful APIs (primary)
+- GraphQL (optional, for complex queries)
+- WebSocket (optional, for real-time updates)
+- X402 Protocol Endpoints (standard compliance)
+

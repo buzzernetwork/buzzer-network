@@ -1,0 +1,236 @@
+PRODUCT REQUIREMENTS DOCUMENT v1 - BUZZER NETWORK
+==================================================
+
+HIGH-LEVEL USER JOURNEY & REQUIREMENTS
+
+1. OVERVIEW
+-----------
+Buzzer Network is an X402-based decentralized ad network on BASE blockchain that connects advertisers directly with premium publishers, enabling crypto-native payments and transparent revenue sharing.
+
+Core Value Proposition:
+- Advertisers: Lower fees, instant payments, direct publisher relationships
+- Publishers: Higher revenue share, crypto payments, quality-focused network
+- Network: BUZZ token economy, governance, sustainable growth
+
+2. USER JOURNEYS - HIGH LEVEL
+-------------------------------
+
+A. PUBLISHER JOURNEY
+---------------------
+
+Step 1: Discovery & Onboarding
+- Publisher discovers Buzzer Network (website, referral, marketing)
+- Clicks "Become a Publisher" 
+- Creates account (wallet connect or email)
+- Fills basic info (website URL, category, traffic volume)
+
+Step 2: Verification & Approval
+- System verifies domain ownership (DNS record or HTML file)
+- Quality check: Traffic audit, content review, brand safety
+- Approval/rejection decision
+- If approved: Onboarding complete, publisher dashboard access
+
+Step 3: Integration
+- Publisher receives integration code snippet (X402 compliant)
+- Adds code to website (header, body, or specific ad slots)
+- Tests ad display
+- Goes live
+
+Step 4: Earnings & Payments
+- Ads served on publisher site
+- Impressions tracked and verified (oracle-verified)
+- Earnings accrue in real-time dashboard
+- Automatic crypto payments (daily/weekly) to publisher wallet
+- Publisher can withdraw anytime (minimum threshold)
+
+Step 5: Optimization
+- Publisher views analytics (impressions, revenue, CTR)
+- Adjusts ad placements for better performance
+- Receives recommendations
+- Manages multiple sites from one dashboard
+
+B. ADVERTISER JOURNEY
+---------------------
+
+Step 1: Account Creation
+- Advertiser discovers platform
+- Creates account (wallet connect)
+- Completes profile (company info, payment preferences)
+
+Step 2: Campaign Creation
+- Click "Create Campaign"
+- Define campaign goal (awareness, clicks, conversions)
+- Set targeting (demographics, geography, interests)
+- Upload ad creative(s) or use template
+- Set budget (total budget, daily budget, bid amount)
+
+Step 3: Campaign Launch
+- Review campaign settings
+- Fund campaign wallet (ETH, USDC, or BUZZ tokens)
+- Activate campaign
+- Campaign goes live immediately
+
+Step 4: Campaign Management
+- Monitor real-time performance (impressions, clicks, spend)
+- Adjust targeting or bids in real-time
+- Pause/resume campaigns
+- Update ad creatives
+- View detailed analytics
+
+Step 5: Payment & Settlement
+- Smart contract escrows campaign funds
+- Payments automatically deducted per impression/click
+- Remaining funds can be withdrawn anytime
+- Receive invoices/receipts on-chain
+
+C. NETWORK OPERATIONS (INTERNAL)
+--------------------------------
+
+Step 1: Quality Assurance
+- Automated publisher quality scoring
+- Fraud detection for clicks/impressions
+- Content moderation for ad creatives
+- Brand safety monitoring
+
+Step 2: Matching & Delivery
+- Real-time ad selection algorithm
+- Match advertiser campaigns to publisher inventory
+- Deliver ads via X402 protocol
+- Track and verify all events
+
+Step 3: Settlement
+- Aggregate impression/click data
+- Calculate publisher earnings
+- Calculate network fees
+- Execute automated payments
+- Update on-chain records
+
+3. CORE FUNCTIONAL REQUIREMENTS
+--------------------------------
+
+FR1: Publisher Management
+- Publisher registration and KYC (optional)
+- Domain verification
+- Quality scoring system
+- Publisher dashboard
+- Earnings tracking
+- Payment management
+
+FR2: Advertiser Management
+- Advertiser account creation
+- Campaign creation and management
+- Creative management (upload, approve, A/B test)
+- Budget management
+- Performance analytics
+- Payment processing
+
+FR3: Ad Serving & Matching
+- Real-time ad selection
+- X402 protocol compliance
+- Multiple ad formats (banner, native, video)
+- Targeting engine
+- Bidding system (CPM, CPC models)
+
+FR4: Payment & Settlement
+- Multi-crypto payment support (ETH, USDC, BUZZ)
+- Smart contract escrow
+- Automated publisher payouts
+- Transaction history
+- On-chain verification
+
+FR5: Analytics & Reporting
+- Real-time dashboards
+- Impressions, clicks, conversions tracking
+- Revenue reporting
+- Performance metrics
+- Export capabilities
+
+FR6: Anti-Fraud & Quality
+- Click fraud detection
+- Impression verification
+- Bot traffic filtering
+- Publisher quality scoring
+- Content moderation
+
+FR7: Token Economics (BUZZ)
+- BUZZ token payments
+- Staking mechanisms
+- Governance voting
+- Revenue sharing pools
+- Token distribution
+
+4. NON-FUNCTIONAL REQUIREMENTS
+------------------------------
+
+NFR1: Performance
+- Ad serving latency: < 100ms
+- Dashboard load time: < 2s
+- Payment settlement: Near real-time (< 1 hour)
+
+NFR2: Scalability
+- Support 10,000+ publishers
+- Handle 1M+ ad requests/day
+- Support 1,000+ active campaigns
+
+NFR3: Security
+- Smart contract audits
+- Secure wallet integration
+- Fraud prevention
+- Data encryption
+
+NFR4: Usability
+- Mobile-responsive design
+- Intuitive UI/UX
+- Clear documentation
+- Help/support system
+
+NFR5: Compliance
+- GDPR/CCPA privacy compliance
+- Advertising standards
+- Financial regulations
+
+5. SUCCESS METRICS
+------------------
+
+Publisher Metrics:
+- Number of active publishers
+- Average revenue per publisher
+- Publisher retention rate
+- Time to first payment
+
+Advertiser Metrics:
+- Number of active advertisers
+- Campaign creation rate
+- Ad spend volume
+- Advertiser retention
+
+Network Metrics:
+- Total ad impressions
+- Network revenue
+- BUZZ token utilization
+- Platform adoption rate
+
+6. INITIAL SCOPE PRIORITIES
+---------------------------
+
+Phase 1 (MVP):
+- Basic publisher onboarding
+- Simple ad campaign creation
+- X402 ad serving integration
+- Basic payment settlement (ETH/USDC)
+- Simple analytics dashboard
+
+Phase 2:
+- BUZZ token integration
+- Advanced targeting
+- Fraud detection
+- Publisher quality scoring
+- Enhanced analytics
+
+Phase 3:
+- Governance features
+- Staking mechanisms
+- Advanced ad formats
+- Retargeting
+- API access
+

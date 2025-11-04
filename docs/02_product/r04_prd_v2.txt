@@ -1,0 +1,458 @@
+PRODUCT REQUIREMENTS DOCUMENT v2 - BUZZER NETWORK
+==================================================
+
+REFINED & PRECISE REQUIREMENTS (Based on Iterations)
+
+1. EXECUTIVE SUMMARY
+--------------------
+Buzzer Network is a decentralized ad network built on BASE blockchain using the X402 protocol standard. It enables direct connections between advertisers and premium publishers with crypto-native payments, eliminating traditional ad network intermediaries and their 30-50% fees.
+
+Target Users:
+- Publishers: High-quality websites/apps seeking better revenue share and crypto payments
+- Advertisers: Brands/agencies wanting lower costs, transparency, and instant payments
+- Initial Focus: Premium publishers (curated) + SMB advertisers (crypto-friendly)
+
+2. REFINED USER JOURNEYS
+-------------------------
+
+A. PUBLISHER JOURNEY (Detailed)
+--------------------------------
+
+Registration Flow:
+1. Landing page → "Publishers" → "Get Started"
+2. Wallet connection (MetaMask, WalletConnect) OR email signup
+3. If email: Create password, verify email, then connect wallet for payments
+4. Accept terms of service (on-chain signature for transparency)
+
+Onboarding Flow:
+1. Publisher Dashboard → "Add Website"
+2. Enter website URL, category, monthly traffic estimate
+3. Install verification code (DNS TXT record OR HTML meta tag OR file upload)
+4. System validates ownership (automated check)
+5. Quality Assessment:
+   - Traffic audit (traffic sources, bot detection)
+   - Content scan (brand safety, prohibited content)
+   - Domain age and reputation check
+   - Scoring algorithm assigns quality score (1-100)
+6. Approval Threshold: Quality score >= 70
+7. If approved: Onboarding wizard (integration setup)
+8. If rejected: Feedback provided, can reapply after improvements
+
+Integration Flow:
+1. Publisher selects ad format (banner, native, video)
+2. System generates X402-compliant code snippet:
+   ```html
+   <script src="https://buzzer.network/x402-ad.js" 
+           data-pub-id="PUB_XXX"
+           data-slot-id="SLOT_YYY"
+           data-format="banner"></script>
+   ```
+3. Publisher copies code to website header/footer
+4. Preview mode available (test ads before going live)
+5. Publisher activates site (goes live)
+
+Earnings Flow:
+1. Ads serve on publisher site (X402 protocol handles delivery)
+2. Each impression logged (oracle verification optional for premium)
+3. Real-time earnings dashboard:
+   - Today's earnings
+   - Pending earnings (awaiting settlement)
+   - Historical earnings
+   - Earnings by site/ad slot
+4. Settlement Cycle:
+   - Automatic daily settlement (24h cycle)
+   - Minimum payout: 0.01 ETH or 10 USDC or 100 BUZZ
+   - If below minimum: Accumulates until threshold
+   - Payment method: Publisher-selected wallet address
+5. Withdrawal:
+   - Publisher requests withdrawal (instant if above minimum)
+   - Smart contract executes payment
+   - Gas fees: Network covers (for BASE transactions)
+   - Transaction hash provided for tracking
+
+B. ADVERTISER JOURNEY (Detailed)
+---------------------------------
+
+Account Setup:
+1. Landing page → "Advertisers" → "Create Campaign"
+2. Wallet connection required (no email option - crypto-native only)
+3. Company profile: Name, website, industry, description
+4. Payment wallet setup: Default wallet for campaign funding
+
+Campaign Creation Flow:
+1. Dashboard → "New Campaign"
+2. Campaign Basics:
+   - Campaign name
+   - Campaign objective: Awareness (impressions) OR Clicks OR Conversions
+   - Start/end dates (optional - can run indefinitely)
+3. Budget Setup:
+   - Total budget: Maximum spend (in ETH, USDC, or BUZZ)
+   - Daily budget: Optional cap per day
+   - Payment method: Select wallet, approve token spend
+   - Funds escrowed in smart contract
+4. Targeting:
+   - Geographic: Countries/regions (multi-select)
+   - Category: Publisher categories (tech, finance, lifestyle, etc.)
+   - Quality filter: Minimum publisher quality score (70, 80, 90)
+   - Device type: Desktop, mobile, tablet (all by default)
+5. Ad Creative:
+   - Format selection: Banner (300x250, 728x90, 970x250) OR Native OR Video
+   - Upload creative (max 5MB, formats: JPG, PNG, GIF, MP4)
+   - OR use template builder (drag-and-drop)
+   - Ad copy: Headline, description, CTA button text
+   - Landing page URL
+   - Preview ad appearance
+6. Bidding:
+   - Bid model: CPM (cost per 1000 impressions) OR CPC (cost per click)
+   - Bid amount: Set price per unit
+   - Budget allocation: How to spend (evenly vs. performance-optimized)
+7. Review & Launch:
+   - Campaign summary screen
+   - Estimated reach and impressions (based on budget/bid)
+   - Approve and launch
+   - Campaign goes live immediately
+
+Campaign Management Flow:
+1. Campaign Dashboard:
+   - Active campaigns list
+   - Performance metrics: Impressions, clicks, CTR, spend, remaining budget
+   - Real-time updates (refresh every 30s)
+2. Campaign Actions:
+   - Pause/Resume: Instant (stops ad delivery)
+   - Edit: Modify targeting, bids, budget (some changes require approval)
+   - Duplicate: Create similar campaign quickly
+   - Archive: End campaign, withdraw remaining funds
+3. Analytics Deep Dive:
+   - Performance by day/time
+   - Performance by publisher (top performers)
+   - Performance by geography
+   - Conversion tracking (if pixel installed)
+4. Budget Management:
+   - Add funds: Top up campaign budget
+   - Withdraw funds: Remove unused budget (instant)
+   - Set auto-pause: Pause when budget exhausted
+
+Payment & Billing:
+1. Transaction History:
+   - All deposits to campaign wallets
+   - All ad spend (per impression/click)
+   - All withdrawals
+   - On-chain transaction links
+2. Invoicing:
+   - Automatic on-chain receipts
+   - Export for accounting
+   - Tax reporting support (transaction export)
+
+C. AD SERVING & MATCHING FLOW (System)
+--------------------------------------
+
+Ad Request Flow:
+1. User visits publisher site
+2. X402 ad script loads
+3. Ad request sent to Buzzer Network API:
+   - Publisher ID
+   - Slot ID
+   - User context (anonymized): Geo (country level), device type, category
+   - Timestamp
+4. Matching Engine:
+   - Query active campaigns matching:
+     * Publisher quality score requirement
+     * Geographic targeting
+     * Category match
+     * Budget available
+     * Campaign active status
+   - Rank by bid amount (highest bid wins)
+   - Select winning ad
+5. Ad Delivery:
+   - Return ad creative URL (stored on IPFS or CDN)
+   - Ad displays on publisher site
+   - Impression event logged
+
+Impression Tracking:
+1. Ad displays on page
+2. JavaScript pixel fires impression event
+3. Event sent to tracking API (with publisher ID, campaign ID, timestamp)
+4. Event verified (anti-fraud checks: bot detection, duplicate prevention)
+5. Valid impression recorded in database
+6. Publisher earnings calculated and updated
+7. Advertiser spend deducted from budget
+
+Click Tracking:
+1. User clicks ad
+2. Click event fired
+3. Redirect to advertiser landing page (with tracking parameter)
+4. Click logged (same verification process)
+5. CPC campaign: Deduct click cost from budget
+
+Settlement Process:
+1. Every 24 hours (configurable):
+   - Aggregate all verified impressions/clicks for period
+   - Calculate publisher earnings:
+     * Impressions × CPM bid / 1000
+     * Clicks × CPC bid
+     * Apply revenue share: 85% publisher, 15% network
+   - Calculate network fees
+   - Execute batch payments via smart contract
+   - Update on-chain records
+2. Publishers receive payment automatically
+3. Advertiser budgets updated
+4. Settlement report generated
+
+3. PRECISE FUNCTIONAL REQUIREMENTS
+----------------------------------
+
+FR1.1: Publisher Registration
+- Wallet connection (MetaMask, Coinbase Wallet, WalletConnect)
+- Email alternative (with mandatory wallet link for payments)
+- On-chain terms acceptance
+- KYC optional (required for >$10k/month earnings)
+
+FR1.2: Publisher Verification
+- Domain ownership verification (3 methods: DNS, HTML meta tag, file upload)
+- Automated quality scoring algorithm:
+  * Traffic quality (real vs bot)
+  * Content quality (brand safety)
+  * Domain authority
+  * Historical performance (if returning publisher)
+- Minimum quality score: 70/100 for approval
+- Manual review option for borderline cases (70-75)
+
+FR1.3: Publisher Integration
+- X402-compliant ad script generation
+- Multiple ad slot support per publisher
+- Ad format selection (banner, native, video)
+- Preview mode before going live
+- Integration validation (test mode)
+
+FR1.4: Publisher Earnings
+- Real-time earnings calculation
+- Earnings breakdown (by site, by slot, by campaign)
+- Historical earnings (last 30 days, 90 days, all time)
+- Pending vs. settled earnings display
+- Minimum payout thresholds (configurable per payment method)
+
+FR1.5: Publisher Payments
+- Automated daily settlement (or weekly if < minimum threshold)
+- Multi-crypto support: ETH, USDC, BUZZ
+- Payment method selection per site
+- Transaction history with on-chain links
+- Payment notifications (optional email/webhook)
+
+FR2.1: Advertiser Account
+- Wallet-only registration (crypto-native)
+- Company profile management
+- Payment wallet configuration
+- Account verification (optional, for brand safety)
+
+FR2.2: Campaign Creation
+- Campaign builder wizard (step-by-step)
+- Multiple campaign objectives (awareness, clicks, conversions)
+- Budget management (total + daily caps)
+- Multi-crypto funding (ETH, USDC, BUZZ)
+- Smart contract escrow integration
+
+FR2.3: Targeting Engine
+- Geographic targeting (country-level granularity)
+- Publisher category targeting
+- Quality filter (minimum publisher score)
+- Device targeting
+- Time-based targeting (optional: day/hour scheduling)
+
+FR2.4: Ad Creative Management
+- Creative upload (file size limits, format validation)
+- Template builder (drag-and-drop, pre-made templates)
+- Ad preview (desktop + mobile views)
+- Creative approval workflow (auto-approve if passes checks)
+- A/B testing support (multiple creatives per campaign)
+
+FR2.5: Bidding System
+- CPM bidding model
+- CPC bidding model
+- Bid amount input with currency selection
+- Real-time bid recommendations (based on market rates)
+- Budget pacing (even distribution vs. performance-optimized)
+
+FR2.6: Campaign Management
+- Real-time performance dashboard
+- Campaign control (pause, resume, archive)
+- Budget top-up and withdrawal
+- Campaign editing (with validation)
+- Campaign duplication
+
+FR3.1: Ad Serving (X402 Compliance)
+- X402 protocol implementation
+- Ad request handling (REST API or X402 standard endpoint)
+- Ad response format (X402 compliant JSON)
+- Multiple ad format support
+- Ad creative storage (IPFS + CDN fallback)
+
+FR3.2: Matching Algorithm
+- Real-time campaign matching (< 100ms response time)
+- Multi-factor matching: geo, category, quality, budget, bid
+- Bid-based ranking (highest bid wins)
+- Fair distribution algorithm (prevent single-campaign dominance)
+
+FR3.3: Impression Tracking
+- Client-side impression pixel
+- Server-side verification
+- Anti-fraud validation (bot detection, duplicate prevention)
+- Oracle integration (optional, for premium verification)
+- Real-time event logging
+
+FR3.4: Click Tracking
+- Click event capture
+- Redirect with tracking parameters
+- Click fraud detection
+- Conversion tracking (optional pixel integration)
+
+FR4.1: Payment Infrastructure
+- Smart contract escrow (for advertiser budgets)
+- Automated payout contracts (for publisher earnings)
+- Multi-token support (ETH, USDC, BUZZ native)
+- Gas optimization (batch processing, L2 advantages)
+- Transaction fee handling (network covers BASE gas)
+
+FR4.2: Settlement System
+- Scheduled settlement jobs (daily cron)
+- Earnings aggregation
+- Revenue share calculation (85/15 split)
+- Batch payment execution
+- Settlement report generation
+- On-chain record updates
+
+FR5.1: Analytics Platform
+- Real-time dashboards (30s refresh rate)
+- Publisher analytics: impressions, earnings, CTR, top campaigns
+- Advertiser analytics: impressions, clicks, CTR, spend, conversions
+- Network analytics: total volume, active campaigns, active publishers
+- Export functionality (CSV, JSON)
+
+FR5.2: Reporting
+- Custom date ranges
+- Performance trends (charts)
+- Comparative analysis (campaign vs campaign)
+- Publisher performance reports (for advertisers)
+- Advertiser performance reports (for publishers, anonymized)
+
+FR6.1: Fraud Detection
+- Bot traffic detection (ML models)
+- Click fraud prevention (rate limiting, pattern detection)
+- Impression fraud (duplicate detection, invalid traffic)
+- Publisher quality monitoring (ongoing scoring)
+- Ad creative moderation (automated + manual review)
+
+FR6.2: Quality Assurance
+- Publisher quality scoring (continuous updates)
+- Content moderation (prohibited content detection)
+- Brand safety checks
+- Ad creative compliance (size, format, content)
+- Performance quality metrics
+
+FR7.1: BUZZ Token Integration
+- BUZZ as payment option (for both advertisers and publishers)
+- Token staking (publishers stake for higher quality tier)
+- Governance voting (token holders vote on proposals)
+- Token rewards (referral bonuses, early adopter incentives)
+- Token distribution (revenue sharing pools)
+
+4. REFINED NON-FUNCTIONAL REQUIREMENTS
+---------------------------------------
+
+NFR1: Performance
+- Ad serving latency: P95 < 100ms (global CDN)
+- Dashboard load time: P95 < 2s
+- Payment settlement: < 1 hour (automated daily batch)
+- API response time: P95 < 200ms
+
+NFR2: Scalability
+- Support 10,000+ publishers (Phase 1: 1,000)
+- Handle 10M+ ad requests/day (Phase 1: 1M)
+- Support 5,000+ active campaigns (Phase 1: 500)
+- Database: Horizontal scaling ready
+
+NFR3: Security
+- Smart contract audits (before mainnet)
+- Wallet security (no private key storage)
+- API authentication (JWT + wallet signatures)
+- Data encryption (at rest and in transit)
+- DDoS protection
+- Rate limiting
+
+NFR4: Reliability
+- Uptime: 99.9% (ad serving critical path)
+- Payment reliability: 100% (smart contract guarantees)
+- Data backup: Daily automated backups
+- Disaster recovery: < 4 hour RTO
+
+NFR5: Usability
+- Mobile-responsive (all dashboards)
+- Intuitive UI (no training required)
+- Clear error messages
+- Help documentation (in-app + external)
+- Support system (ticket system, Discord)
+
+NFR6: Compliance
+- GDPR compliance (privacy controls, data deletion)
+- CCPA compliance (California users)
+- Advertising standards (truth in advertising)
+- Token regulatory compliance (consultation required)
+
+5. SUCCESS METRICS & KPIs
+--------------------------
+
+Publisher Metrics:
+- Active publishers: 1,000 in first 6 months
+- Average monthly revenue per publisher: $500+
+- Publisher retention: 80%+ month-over-month
+- Time to first payment: < 48 hours
+
+Advertiser Metrics:
+- Active advertisers: 500 in first 6 months
+- Monthly ad spend: $100K+ in first 6 months
+- Advertiser retention: 70%+ month-over-month
+- Campaign creation rate: 50+ new campaigns/week
+
+Network Metrics:
+- Total impressions: 100M+ in first 6 months
+- Network revenue: $15K+ monthly (15% of ad spend)
+- BUZZ token adoption: 30%+ of transactions
+- Platform NPS: 50+
+
+6. TECHNICAL CONSTRAINTS
+------------------------
+
+Blockchain:
+- BASE network (L2 Ethereum)
+- EVM compatibility required
+- Gas optimization critical
+- Oracle integration needed
+
+Protocol:
+- X402 standard compliance (mandatory)
+- Interoperability with other X402 networks (future)
+
+Storage:
+- Ad creatives: IPFS primary, CDN fallback
+- Analytics data: Time-series database
+- User data: Encrypted database
+
+7. OUT OF SCOPE (v2)
+--------------------
+
+Phase 1 Exclusions:
+- Video ad serving (banner + native only)
+- Retargeting campaigns
+- Advanced audience targeting (third-party data)
+- API access for third-party integrations
+- Mobile app SDK (web only)
+- Programmatic buying (DSP/SSP features)
+- Advanced A/B testing tools
+- White-label solutions
+
+Future Considerations:
+- Cross-chain support (beyond BASE)
+- Advanced AI targeting
+- Video ad formats
+- Mobile SDK
+- API marketplace
+
