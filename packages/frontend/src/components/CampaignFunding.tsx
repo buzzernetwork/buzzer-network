@@ -5,6 +5,10 @@ import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagm
 import { parseEther } from 'viem';
 import { api } from '@/lib/api';
 import { getAuthToken } from '@/lib/auth';
+import { GlassCard } from '@/components/GlassCard';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface CampaignFundingProps {
   campaignId: string;
@@ -87,66 +91,69 @@ export function CampaignFunding({ campaignId, onSuccess }: CampaignFundingProps)
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-semibold mb-4">Fund Campaign</h2>
+    <GlassCard variant="dark" blur="xl" className="p-6">
+      <h2 className="text-xl font-semibold mb-4 text-white">Fund Campaign</h2>
 
       {step === 'input' && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <Label htmlFor="amount" className="text-white/80 mb-2 block">
               Amount (ETH)
-            </label>
-            <input
+            </Label>
+            <Input
+              id="amount"
               type="number"
               step="0.001"
               min="0.001"
               required
+              variant="glass"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
               placeholder="0.1"
             />
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-white/40">
               Minimum funding: 0.001 ETH
             </p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-200 px-4 py-3 rounded-2xl">
               {error}
             </div>
           )}
 
-          <button
+          <Button
             type="submit"
+            variant="glass-dark"
+            size="lg"
             disabled={loading || !isConnected}
-            className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full"
           >
             {loading ? 'Preparing...' : 'Fund Campaign'}
-          </button>
+          </Button>
         </form>
       )}
 
       {step === 'preparing' && (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Preparing transaction...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white/30 mx-auto mb-4"></div>
+          <p className="text-white/60">Preparing transaction...</p>
         </div>
       )}
 
       {step === 'transaction' && (
         <div className="space-y-4">
           {isWriting && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-yellow-800">Please confirm the transaction in your wallet...</p>
+            <div className="bg-yellow-500/20 backdrop-blur-sm border border-yellow-500/30 rounded-2xl p-4">
+              <p className="text-yellow-200">Please confirm the transaction in your wallet...</p>
             </div>
           )}
 
           {isConfirming && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800">Transaction submitted. Waiting for confirmation...</p>
+            <div className="bg-blue-500/20 backdrop-blur-sm border border-blue-500/30 rounded-2xl p-4">
+              <p className="text-blue-200">Transaction submitted. Waiting for confirmation...</p>
               {hash && (
-                <p className="text-sm text-blue-600 mt-2">
+                <p className="text-sm text-blue-300 mt-2">
                   Hash: {hash.substring(0, 10)}...{hash.substring(hash.length - 8)}
                 </p>
               )}
@@ -154,14 +161,14 @@ export function CampaignFunding({ campaignId, onSuccess }: CampaignFundingProps)
           )}
 
           {isConfirmed && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-green-800 font-semibold">✅ Funding successful!</p>
+            <div className="bg-green-500/20 backdrop-blur-sm border border-green-500/30 rounded-2xl p-4">
+              <p className="text-green-200 font-semibold">✅ Funding successful!</p>
               {hash && (
                 <a
                   href={`https://${process.env.NEXT_PUBLIC_BASE_NETWORK === 'base-mainnet' ? '' : 'sepolia.'}basescan.org/tx/${hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-green-600 hover:underline mt-2 block"
+                  className="text-sm text-green-300 hover:underline mt-2 block"
                 >
                   View on BaseScan
                 </a>
@@ -170,13 +177,13 @@ export function CampaignFunding({ campaignId, onSuccess }: CampaignFundingProps)
           )}
 
           {writeError && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800">Transaction failed: {writeError.message}</p>
+            <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 rounded-2xl p-4">
+              <p className="text-red-200">Transaction failed: {writeError.message}</p>
             </div>
           )}
         </div>
       )}
-    </div>
+    </GlassCard>
   );
 }
 

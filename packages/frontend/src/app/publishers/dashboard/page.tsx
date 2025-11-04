@@ -5,6 +5,8 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { getAuthToken } from '@/lib/auth';
 import { api } from '@/lib/api';
+import { GlassCard } from '@/components/GlassCard';
+import { Button } from '@/components/ui/button';
 
 export default function PublisherDashboardPage() {
   const { isConnected, address } = useAccount();
@@ -51,120 +53,147 @@ export default function PublisherDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading...</div>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: "url('/bg.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="text-xl text-white">Loading...</div>
       </div>
     );
   }
 
   if (!publisher) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Not Registered</h2>
-          <p className="text-gray-600 mb-6">Please register as a publisher first.</p>
-          <button
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{
+          backgroundImage: "url('/bg.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <GlassCard variant="dark" blur="xl" className="p-8 max-w-md text-center">
+          <h2 className="text-2xl font-bold mb-4 text-white">Not Registered</h2>
+          <p className="text-white/60 mb-6">Please register as a publisher first.</p>
+          <Button
+            variant="glass-dark"
             onClick={() => router.push('/publishers')}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
           >
             Register as Publisher
-          </button>
-        </div>
+          </Button>
+        </GlassCard>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Publisher Dashboard</h1>
+    <div
+      className="min-h-screen py-8"
+      style={{
+        backgroundImage: "url('/bg.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      <div className="container mx-auto px-4 max-w-6xl">
+        <h1 className="text-3xl font-bold text-white mb-8">Publisher Dashboard</h1>
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Total Earnings</h3>
-            <p className="text-3xl font-bold text-indigo-600">
+          <GlassCard variant="dark" blur="xl" className="p-6">
+            <h3 className="text-sm font-medium text-white/60 mb-2">Total Earnings</h3>
+            <p className="text-3xl font-bold text-white">
               {earnings?.earnings?.total?.toFixed(4) || '0.0000'} ETH
             </p>
-          </div>
+          </GlassCard>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Status</h3>
+          <GlassCard variant="dark" blur="xl" className="p-6">
+            <h3 className="text-sm font-medium text-white/60 mb-2">Status</h3>
             <p className={`text-2xl font-semibold ${
-              publisher.status === 'approved' ? 'text-green-600' :
-              publisher.status === 'pending' ? 'text-yellow-600' :
-              'text-red-600'
+              publisher.status === 'approved' ? 'text-green-300' :
+              publisher.status === 'pending' ? 'text-yellow-300' :
+              'text-red-300'
             }`}>
               {publisher.status.charAt(0).toUpperCase() + publisher.status.slice(1)}
             </p>
-          </div>
+          </GlassCard>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Quality Score</h3>
-            <p className="text-3xl font-bold text-gray-900">
+          <GlassCard variant="dark" blur="xl" className="p-6">
+            <h3 className="text-sm font-medium text-white/60 mb-2">Quality Score</h3>
+            <p className="text-3xl font-bold text-white">
               {publisher.quality_score || 'N/A'}
             </p>
-          </div>
+          </GlassCard>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Account Information</h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Website</p>
-              <p className="font-medium">{publisher.website_url}</p>
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          <GlassCard variant="dark" blur="xl" className="p-6">
+            <h2 className="text-xl font-semibold mb-4 text-white">Account Information</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-white/60">Website</p>
+                <p className="font-medium text-white">{publisher.website_url}</p>
+              </div>
+              <div>
+                <p className="text-sm text-white/60">Payment Wallet</p>
+                <p className="font-mono text-sm text-white">{publisher.payment_wallet}</p>
+              </div>
+              <div>
+                <p className="text-sm text-white/60">Domain Verified</p>
+                <p className="font-medium text-white">
+                  {publisher.domain_verified ? '✅ Yes' : '❌ No'}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-white/60">Registered</p>
+                <p className="font-medium text-white">
+                  {new Date(publisher.created_at).toLocaleDateString()}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-500">Payment Wallet</p>
-              <p className="font-mono text-sm">{publisher.payment_wallet}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Domain Verified</p>
-              <p className="font-medium">
-                {publisher.domain_verified ? '✅ Yes' : '❌ No'}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Registered</p>
-              <p className="font-medium">
-                {new Date(publisher.created_at).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        </div>
+          </GlassCard>
 
-        {earnings && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Earnings Summary</h2>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Events</span>
-                <span className="font-medium">{earnings.earnings?.event_count || 0}</span>
+          {earnings && (
+            <GlassCard variant="dark" blur="xl" className="p-6">
+              <h2 className="text-xl font-semibold mb-4 text-white">Earnings Summary</h2>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-white/60">Total Events</span>
+                  <span className="font-medium text-white">{earnings.earnings?.event_count || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/60">Total Earnings</span>
+                  <span className="font-bold text-white">
+                    {earnings.earnings?.total?.toFixed(4) || '0.0000'} ETH
+                  </span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Total Earnings</span>
-                <span className="font-bold text-indigo-600">
-                  {earnings.earnings?.total?.toFixed(4) || '0.0000'} ETH
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
+            </GlassCard>
+          )}
+        </div>
 
         {(!publisher.domain_verified || publisher.status === 'pending') && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-6">
-            <h3 className="font-semibold text-yellow-800 mb-2">Action Required</h3>
-            <p className="text-yellow-700 mb-4">
+          <GlassCard variant="dark" blur="xl" className="p-6 bg-yellow-500/10 border-yellow-500/30">
+            <h3 className="font-semibold text-yellow-200 mb-2">Action Required</h3>
+            <p className="text-yellow-200/80 mb-4">
               {publisher.domain_verified 
                 ? 'Your publisher account is pending approval.'
                 : 'Please verify your domain ownership to start earning.'}
             </p>
-            <button
+            <Button
+              variant="glass-dark"
+              className="bg-yellow-500/20 hover:bg-yellow-500/30 border-yellow-500/30"
               onClick={() => router.push('/publishers/verify')}
-              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
             >
               {publisher.domain_verified ? 'Check Status' : 'Verify Domain'}
-            </button>
-          </div>
+            </Button>
+          </GlassCard>
         )}
       </div>
     </div>

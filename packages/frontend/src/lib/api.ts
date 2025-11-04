@@ -18,9 +18,45 @@ async function fetchAPI(
     },
   });
 
+  // Check content type before parsing
+  const contentType = response.headers.get('content-type');
+  const isJSON = contentType?.includes('application/json');
+
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-    throw new Error(error.error || `HTTP ${response.status}`);
+    let errorMessage = `HTTP ${response.status}`;
+    
+    // Try to parse JSON error response
+    if (isJSON) {
+      try {
+        const error = await response.json();
+        errorMessage = error.error || error.message || errorMessage;
+      } catch {
+        // JSON parsing failed, use default message
+      }
+    } else {
+      // For non-JSON errors (HTML pages, etc.), try to get text
+      try {
+        const text = await response.text();
+        // Only use text if it's short and looks like an error message
+        if (text.length < 200 && !text.includes('<!DOCTYPE')) {
+          errorMessage = text;
+        }
+      } catch {
+        // Ignore text parsing errors
+      }
+    }
+    
+    throw new Error(errorMessage);
+  }
+
+  // Validate that we received JSON before parsing
+  if (!isJSON) {
+    const text = await response.text();
+    throw new Error(
+      `Expected JSON response but received ${contentType || 'unknown type'}. ` +
+      `This usually means the backend server is not running or the endpoint doesn't exist. ` +
+      `URL: ${url}`
+    );
   }
 
   return response.json();
@@ -199,6 +235,11 @@ export const api = {
         Authorization: `Bearer ${token}`,
       },
     });
+  },
+
+  // Scraper/Gallery
+  async getMemeGallery() {
+    return fetchAPI('/api/v1/scraper/gallery');
   },
 };
 

@@ -5,6 +5,9 @@ import { useAccount } from 'wagmi';
 import { useRouter } from 'next/navigation';
 import { getAuthToken } from '@/lib/auth';
 import { api } from '@/lib/api';
+import { GlassCard } from '@/components/GlassCard';
+import { Button } from '@/components/ui/button';
+import { Check } from 'lucide-react';
 
 export default function DomainVerificationPage() {
   const { isConnected, address } = useAccount();
@@ -95,24 +98,40 @@ export default function DomainVerificationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading...</div>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: "url('/bg.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="text-xl text-white">Loading...</div>
       </div>
     );
   }
 
   if (!publisher) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Publisher Not Found</h2>
-          <button
+      <div
+        className="min-h-screen flex items-center justify-center p-4"
+        style={{
+          backgroundImage: "url('/bg.jpeg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <GlassCard variant="dark" blur="xl" className="p-8 max-w-md text-center">
+          <h2 className="text-2xl font-bold mb-4 text-white">Publisher Not Found</h2>
+          <Button
+            variant="glass-dark"
             onClick={() => router.push('/publishers')}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
           >
             Register as Publisher
-          </button>
-        </div>
+          </Button>
+        </GlassCard>
       </div>
     );
   }
@@ -124,30 +143,36 @@ export default function DomainVerificationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div
+      className="min-h-screen py-8"
+      style={{
+        backgroundImage: "url('/bg.jpeg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Domain Verification</h1>
-          <p className="text-gray-600 mb-8">
-            Verify ownership of <strong>{publisher.website_url}</strong>
+        <GlassCard variant="dark" blur="xl" className="p-8">
+          <h1 className="text-3xl font-bold text-white mb-2">Domain Verification</h1>
+          <p className="text-white/60 mb-8">
+            Verify ownership of <strong className="text-white">{publisher.website_url}</strong>
           </p>
 
           {publisher.domain_verified ? (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            <GlassCard variant="dark" blur="xl" className="p-6 bg-green-500/10 border-green-500/30">
               <div className="flex items-center gap-3">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="w-8 h-8 text-green-300" />
                 <div>
-                  <h3 className="text-lg font-semibold text-green-800">Domain Verified</h3>
-                  <p className="text-green-700">Your domain has been successfully verified.</p>
+                  <h3 className="text-lg font-semibold text-green-200">Domain Verified</h3>
+                  <p className="text-green-200/80">Your domain has been successfully verified.</p>
                 </div>
               </div>
-            </div>
+            </GlassCard>
           ) : (
             <>
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white/80 mb-2">
                   Verification Method
                 </label>
                 <div className="grid grid-cols-3 gap-4">
@@ -155,14 +180,14 @@ export default function DomainVerificationPage() {
                     <button
                       key={m}
                       onClick={() => setMethod(m)}
-                      className={`px-4 py-3 rounded-lg border-2 transition ${
+                      className={`px-4 py-3 rounded-2xl border-2 transition ${
                         method === m
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                          : 'border-gray-300 hover:border-gray-400'
+                          ? 'border-white/30 bg-white/20 backdrop-blur-sm text-white'
+                          : 'border-white/10 hover:border-white/20 bg-white/5 text-white/60 hover:text-white/80'
                       }`}
                     >
                       <div className="font-semibold capitalize">{m}</div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-white/40 mt-1">
                         {m === 'dns' && 'DNS TXT Record'}
                         {m === 'html' && 'HTML Meta Tag'}
                         {m === 'file' && 'File Upload'}
@@ -173,20 +198,20 @@ export default function DomainVerificationPage() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white/80 mb-2">
                   Verification Token
                 </label>
-                <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 font-mono text-sm break-all">
+                <div className="bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl p-4 font-mono text-sm break-all text-white">
                   {verificationToken || 'Loading...'}
                 </div>
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white/80 mb-2">
                   Instructions
                 </label>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <pre className="whitespace-pre-wrap text-sm text-gray-700">
+                <div className="bg-blue-500/10 backdrop-blur-sm border border-blue-500/30 rounded-2xl p-4">
+                  <pre className="whitespace-pre-wrap text-sm text-white/80">
                     {instructions[method]}
                   </pre>
                 </div>
@@ -194,10 +219,10 @@ export default function DomainVerificationPage() {
 
               {result && (
                 <div
-                  className={`mb-6 p-4 rounded-lg ${
+                  className={`mb-6 p-4 rounded-2xl backdrop-blur-sm ${
                     result.success
-                      ? 'bg-green-50 border border-green-200 text-green-700'
-                      : 'bg-red-50 border border-red-200 text-red-700'
+                      ? 'bg-green-500/20 border border-green-500/30 text-green-200'
+                      : 'bg-red-500/20 border border-red-500/30 text-red-200'
                   }`}
                 >
                   {result.message}
@@ -205,23 +230,26 @@ export default function DomainVerificationPage() {
               )}
 
               <div className="flex gap-4">
-                <button
+                <Button
+                  variant="outline"
+                  className="border-white/20 bg-white/5 hover:bg-white/10 text-white"
                   onClick={() => router.back()}
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="glass-dark"
+                  size="lg"
                   onClick={handleVerify}
                   disabled={verifying || !verificationToken}
-                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1"
                 >
                   {verifying ? 'Verifying...' : 'Verify Domain'}
-                </button>
+                </Button>
               </div>
             </>
           )}
-        </div>
+        </GlassCard>
       </div>
     </div>
   );
