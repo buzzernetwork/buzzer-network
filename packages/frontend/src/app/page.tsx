@@ -1,6 +1,5 @@
 import InfiniteGallery from "@/components/InfiniteGallery";
 import { LandingNavigation } from "@/components/LandingNavigation";
-import { ScrollIndicator } from "@/components/ScrollIndicator";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -61,9 +60,6 @@ export default function Home() {
         
         {/* Navigation Overlay */}
         <LandingNavigation />
-
-        {/* Scroll Indicator */}
-        <ScrollIndicator />
 
         {/* Hero Text with Value Proposition */}
         <div className="h-full inset-0 pointer-events-none fixed flex items-center justify-center text-center px-3 text-white z-30">
