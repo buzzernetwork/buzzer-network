@@ -1,127 +1,243 @@
-"use client";
-
-import Link from "next/link";
-import { WalletConnect } from "@/components/WalletConnect";
-import { MemeGallery } from "@/components/MemeGallery";
+import InfiniteGallery from "@/components/InfiniteGallery";
+import { LandingNavigation } from "@/components/LandingNavigation";
+import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Zap, TrendingDown, Target } from "lucide-react";
+import Link from "next/link";
+import { Globe, Megaphone, TrendingUp, Shield, Zap, DollarSign } from "lucide-react";
 
 export default function Home() {
-  return (
-    <main className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Background gradient effects */}
-      <div className="fixed inset-0 bg-gradient-to-br from-indigo-950/20 via-black to-purple-950/20 pointer-events-none" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.1),transparent_50%)] pointer-events-none" />
+  const sampleImages = [
+    {
+      src: "/memes/c4258af23cbec75fbd7abaaf75c48a66.jpg",
+      alt: "Creative Ad Inspiration",
+    },
+    {
+      src: "/memes/39dd3e9e61b850b619d37837eb6f76f6.jpg",
+      alt: "Ad Creative Design",
+    },
+    {
+      src: "/memes/d458558f34e6d1cc04587a8190a635cf.jpg",
+      alt: "Marketing Creative",
+    },
+    {
+      src: "/memes/f05b3989614fa591313f7e4a83ea111e.jpg",
+      alt: "Brand Advertisement",
+    },
+    {
+      src: "/memes/5f42d1530f48dba92e8fbafbcc92626c.jpg",
+      alt: "Creative Marketing",
+    },
+    {
+      src: "/memes/baf035ab84a13b53bf6e46662fb4b610.jpg",
+      alt: "Ad Design Inspiration",
+    },
+    {
+      src: "/memes/4d9035ee7bb30f8c274a3fa171504481.jpg",
+      alt: "Creative Advertisement",
+    },
+    {
+      src: "/memes/4c0c4c133ce344d98dcf5b87566416d2.jpg",
+      alt: "Marketing Ad Creative",
+    },
+    {
+      src: "/memes/869188e28c63c5fd27816744bf84d2c4.jpg",
+      alt: "Brand Creative",
+    },
+    {
+      src: "/memes/scraped_65a15fd8127949ff_1762282801970.webp",
+      alt: "Scraped Ad Creative",
+    },
+  ];
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4">
-        <div className="container mx-auto max-w-6xl text-center">
-          <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl font-normal tracking-tight mb-6">
+  return (
+    <main className="min-h-screen">
+      {/* Full-screen gallery */}
+      <div className="h-screen w-full relative">
+        <InfiniteGallery
+          images={sampleImages}
+          speed={1.2}
+          zSpacing={3}
+          visibleCount={12}
+          falloff={{ near: 0.8, far: 14 }}
+          className="h-full w-full rounded-lg overflow-hidden"
+        />
+        
+        {/* Navigation Overlay */}
+        <LandingNavigation />
+
+        {/* Hero Text with Value Proposition */}
+        <div className="h-full inset-0 pointer-events-none fixed flex items-center justify-center text-center px-3 mix-blend-exclusion text-white">
+          <div>
+            <h1 className="font-serif text-4xl md:text-7xl tracking-tight">
               <span className="italic">Ads that drive;</span> brands thrive
             </h1>
-          </div>
-
-          <p className="text-xl md:text-2xl text-white/70 mb-12 max-w-2xl mx-auto font-light animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">
-            X402-based Decentralized Ad Network on BASE Blockchain
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
-            <Button
-              asChild
-              size="lg"
-              variant="glass"
-              className="text-lg px-8 py-6 rounded-2xl"
-            >
-              <Link href="/publishers" className="flex items-center gap-2">
-                For Publishers
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="text-lg px-8 py-6 rounded-2xl border-white/20 bg-white/5 hover:bg-white/10 text-white"
-            >
-              <Link href="/advertisers" className="flex items-center gap-2">
-                For Advertisers
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
-          </div>
-
-          <div className="max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-400">
-            <WalletConnect />
+            <p className="text-xl md:text-2xl text-white/80 mt-6 font-sans">
+              Decentralized ad network on BASE blockchain
+            </p>
+            <p className="text-base md:text-lg text-white/70 mt-3 font-sans">
+              85% revenue share for publishers • 15% fees for advertisers
+            </p>
           </div>
         </div>
-      </section>
 
-      {/* Meme Gallery Section */}
-      <MemeGallery />
+        {/* Bottom instruction text - moved up to make room for CTAs */}
+        <div className="text-center fixed bottom-32 left-0 right-0 font-mono uppercase text-[11px] font-semibold pointer-events-none">
+          <p className="opacity-60">
+            Use mouse wheel, arrow keys, or touch to navigate
+          </p>
+        </div>
+      </div>
 
-      {/* Features Section */}
-      <section className="relative py-32 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="glass-dark rounded-[32px] p-8 hover:scale-[1.02] transition-all duration-300">
-              <div className="mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4">
-                  <Zap className="w-8 h-8 text-white" />
+      {/* Scroll Section Below Gallery */}
+      <section className="min-h-screen bg-frosted-dark py-20">
+        <div className="container mx-auto px-4 max-w-6xl">
+          {/* How It Works */}
+          <div className="mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-4">
+              How It Works
+            </h2>
+            <p className="text-xl text-white/60 text-center mb-12 max-w-2xl mx-auto">
+              Three simple steps to connect advertisers with premium publishers
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <GlassCard variant="dark" blur="xl" className="p-8 text-center">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Globe className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">
-                  Crypto-Native Payments
-                </h3>
-                <p className="text-white/60 leading-relaxed">
-                  Instant payments using X402 protocol on BASE blockchain. No
-                  intermediaries, no delays.
+                <h3 className="text-2xl font-semibold text-white mb-4">Publishers</h3>
+                <p className="text-white/70 mb-6">
+                  Register your website, verify domain ownership, and start earning with premium ads
                 </p>
-              </div>
-            </div>
+                <Link href="/publishers">
+                  <Button variant="glass-dark" size="lg" className="w-full">
+                    Get Started
+                  </Button>
+                </Link>
+              </GlassCard>
 
-            <div className="glass-dark rounded-[32px] p-8 hover:scale-[1.02] transition-all duration-300">
-              <div className="mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4">
-                  <TrendingDown className="w-8 h-8 text-white" />
+              <GlassCard variant="dark" blur="xl" className="p-8 text-center">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Megaphone className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">
-                  Lower Fees
-                </h3>
-                <p className="text-white/60 leading-relaxed">
-                  15% network fee vs 30-40% from traditional networks. More
-                  revenue for publishers.
+                <h3 className="text-2xl font-semibold text-white mb-4">Advertisers</h3>
+                <p className="text-white/70 mb-6">
+                  Create campaigns, set targeting, fund with crypto, and reach quality audiences
                 </p>
-              </div>
-            </div>
+                <Link href="/advertisers">
+                  <Button variant="glass-dark" size="lg" className="w-full">
+                    Get Started
+                  </Button>
+                </Link>
+              </GlassCard>
 
-            <div className="glass-dark rounded-[32px] p-8 hover:scale-[1.02] transition-all duration-300">
-              <div className="mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4">
-                  <Target className="w-8 h-8 text-white" />
+              <GlassCard variant="dark" blur="xl" className="p-8 text-center">
+                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <TrendingUp className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">
-                  Quality Focus
-                </h3>
-                <p className="text-white/60 leading-relaxed">
-                  Curated publisher network for premium ad inventory. Quality
-                  over quantity.
+                <h3 className="text-2xl font-semibold text-white mb-4">Network</h3>
+                <p className="text-white/70 mb-6">
+                  Our matching engine connects the right ads with the right publishers automatically
                 </p>
-              </div>
+              </GlassCard>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Footer CTA */}
-      <section className="relative py-20 px-4 border-t border-white/10">
-        <div className="container mx-auto max-w-4xl text-center">
-          <p className="font-mono uppercase text-[11px] font-semibold text-white/40 tracking-wider mb-4">
-            Decentralized advertising • 60% higher engagement than traditional
-            marketing
-          </p>
-          <p className="font-mono text-xs text-white/30">
-            Connect your wallet to get started
-          </p>
+          {/* Benefits */}
+          <div>
+            <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-4">
+              Why Buzzer Network?
+            </h2>
+            <p className="text-xl text-white/60 text-center mb-12 max-w-2xl mx-auto">
+              Built for the decentralized web with transparency and fairness at its core
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
+              <GlassCard variant="dark" blur="xl" className="p-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <DollarSign className="w-6 h-6 text-green-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white mb-2">Better Revenue Share</h3>
+                    <p className="text-white/70">
+                      Publishers earn 85% of ad revenue (vs 30-40% from traditional networks). 
+                      Advertisers pay only 15% fees (vs 30-40% elsewhere).
+                    </p>
+                  </div>
+                </div>
+              </GlassCard>
+
+              <GlassCard variant="dark" blur="xl" className="p-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-6 h-6 text-blue-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white mb-2">Instant Payments</h3>
+                    <p className="text-white/70">
+                      No net-30 delays. Publishers receive crypto payments directly to their wallet 
+                      with transparent on-chain records.
+                    </p>
+                  </div>
+                </div>
+              </GlassCard>
+
+              <GlassCard variant="dark" blur="xl" className="p-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-6 h-6 text-purple-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white mb-2">Transparent & Trustless</h3>
+                    <p className="text-white/70">
+                      All transactions are recorded on BASE blockchain. Smart contracts ensure 
+                      fair distribution without intermediaries.
+                    </p>
+                  </div>
+                </div>
+              </GlassCard>
+
+              <GlassCard variant="dark" blur="xl" className="p-8">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-6 h-6 text-yellow-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white mb-2">Quality Focused</h3>
+                    <p className="text-white/70">
+                      Domain verification ensures quality publishers. Advanced targeting and 
+                      matching engine delivers better results.
+                    </p>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+
+            {/* Final CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/publishers">
+                <Button
+                  variant="glass-dark"
+                  size="lg"
+                  className="min-w-[240px] h-14 text-base font-semibold"
+                >
+                  <Globe className="w-5 h-5 mr-2" />
+                  Start Publishing
+                </Button>
+              </Link>
+              <Link href="/advertisers">
+                <Button
+                  variant="glass-dark"
+                  size="lg"
+                  className="min-w-[240px] h-14 text-base font-semibold"
+                >
+                  <Megaphone className="w-5 h-5 mr-2" />
+                  Launch Campaign
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </main>
