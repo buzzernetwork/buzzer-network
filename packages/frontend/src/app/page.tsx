@@ -76,12 +76,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Bottom instruction text - moved up to make room for CTAs */}
-        <div className="text-center fixed bottom-32 left-0 right-0 font-mono uppercase text-sm font-semibold pointer-events-none z-30">
-          <p className="text-white/80">
-            Use mouse wheel, arrow keys, or touch to navigate
-          </p>
-        </div>
       </div>
 
       {/* Scroll Section Below Gallery */}
