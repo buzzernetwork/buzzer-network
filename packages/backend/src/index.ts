@@ -35,6 +35,25 @@ app.get('/health', async (req, res) => {
   });
 });
 
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Buzzer Network API',
+    version: '0.1.0',
+    status: 'running',
+    documentation: '/api/v1',
+    health: '/health',
+    endpoints: {
+      health: '/health',
+      api_info: '/api/v1',
+      x402_ad: '/x402/ad',
+      publishers: '/api/v1/publishers',
+      advertisers: '/api/v1/advertisers',
+      tracking: '/track',
+    }
+  });
+});
+
 // API info endpoint
 app.get('/api/v1', (req, res) => {
   res.json({ 
