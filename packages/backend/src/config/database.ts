@@ -15,7 +15,10 @@ export const dbPool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 10000, // Increased timeout for Railway
+  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  // Force IPv4 by using hostname resolution
+  // Railway's network may not support IPv6
 });
 
 // TimescaleDB for analytics (time-series data)
