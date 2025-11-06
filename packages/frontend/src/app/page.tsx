@@ -1,5 +1,6 @@
 import InfiniteGallery from "@/components/InfiniteGallery";
 import { LandingNavigation } from "@/components/LandingNavigation";
+import { ScrollIndicator } from "@/components/ScrollIndicator";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -7,10 +8,6 @@ import { Globe, Megaphone, TrendingUp, Shield, Zap, DollarSign } from "lucide-re
 
 export default function Home() {
   const sampleImages = [
-    {
-      src: "/memes/c4258af23cbec75fbd7abaaf75c48a66.jpg",
-      alt: "Creative Ad Inspiration",
-    },
     {
       src: "/memes/39dd3e9e61b850b619d37837eb6f76f6.jpg",
       alt: "Ad Creative Design",
@@ -65,24 +62,23 @@ export default function Home() {
         {/* Navigation Overlay */}
         <LandingNavigation />
 
+        {/* Scroll Indicator */}
+        <ScrollIndicator />
+
         {/* Hero Text with Value Proposition */}
-        <div className="h-full inset-0 pointer-events-none fixed flex items-center justify-center text-center px-3 mix-blend-exclusion text-white">
-          <div>
-            <h1 className="font-serif text-4xl md:text-7xl tracking-tight">
+        <div className="h-full inset-0 pointer-events-none fixed flex items-center justify-center text-center px-3 text-white z-30">
+          <div className="relative">
+            {/* Background overlay for readability */}
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm rounded-2xl -z-10 -m-8"></div>
+            <h1 className="font-serif text-4xl md:text-7xl tracking-tight relative drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
               <span className="italic">Ads that drive;</span> brands thrive
             </h1>
-            <p className="text-xl md:text-2xl text-white/80 mt-6 font-sans">
-              Decentralized ad network on BASE blockchain
-            </p>
-            <p className="text-base md:text-lg text-white/70 mt-3 font-sans">
-              85% revenue share for publishers • 15% fees for advertisers
-            </p>
           </div>
         </div>
 
         {/* Bottom instruction text - moved up to make room for CTAs */}
-        <div className="text-center fixed bottom-32 left-0 right-0 font-mono uppercase text-[11px] font-semibold pointer-events-none">
-          <p className="opacity-60">
+        <div className="text-center fixed bottom-32 left-0 right-0 font-mono uppercase text-sm font-semibold pointer-events-none z-30">
+          <p className="text-white/80">
             Use mouse wheel, arrow keys, or touch to navigate
           </p>
         </div>
@@ -106,12 +102,12 @@ export default function Home() {
                   <Globe className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-semibold text-white mb-4">Publishers</h3>
-                <p className="text-white/70 mb-6">
+                <p className="text-white/80 mb-6">
                   Register your website, verify domain ownership, and start earning with premium ads
                 </p>
                 <Link href="/publishers">
                   <Button variant="glass-dark" size="lg" className="w-full">
-                    Get Started
+                    Start Publishing
                   </Button>
                 </Link>
               </GlassCard>
@@ -121,12 +117,12 @@ export default function Home() {
                   <Megaphone className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-semibold text-white mb-4">Advertisers</h3>
-                <p className="text-white/70 mb-6">
+                <p className="text-white/80 mb-6">
                   Create campaigns, set targeting, fund with crypto, and reach quality audiences
                 </p>
                 <Link href="/advertisers">
                   <Button variant="glass-dark" size="lg" className="w-full">
-                    Get Started
+                    Launch Campaign
                   </Button>
                 </Link>
               </GlassCard>
@@ -136,7 +132,7 @@ export default function Home() {
                   <TrendingUp className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-semibold text-white mb-4">Network</h3>
-                <p className="text-white/70 mb-6">
+                <p className="text-white/80 mb-6">
                   Our matching engine connects the right ads with the right publishers automatically
                 </p>
               </GlassCard>
@@ -160,7 +156,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-semibold text-white mb-2">Better Revenue Share</h3>
-                    <p className="text-white/70">
+                    <p className="text-white/80">
                       Publishers earn 85% of ad revenue (vs 30-40% from traditional networks). 
                       Advertisers pay only 15% fees (vs 30-40% elsewhere).
                     </p>
@@ -175,7 +171,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-semibold text-white mb-2">Instant Payments</h3>
-                    <p className="text-white/70">
+                    <p className="text-white/80">
                       No net-30 delays. Publishers receive crypto payments directly to their wallet 
                       with transparent on-chain records.
                     </p>
@@ -190,7 +186,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-semibold text-white mb-2">Transparent & Trustless</h3>
-                    <p className="text-white/70">
+                    <p className="text-white/80">
                       All transactions are recorded on BASE blockchain. Smart contracts ensure 
                       fair distribution without intermediaries.
                     </p>
@@ -205,7 +201,7 @@ export default function Home() {
                   </div>
                   <div>
                     <h3 className="text-2xl font-semibold text-white mb-2">Quality Focused</h3>
-                    <p className="text-white/70">
+                    <p className="text-white/80">
                       Domain verification ensures quality publishers. Advanced targeting and 
                       matching engine delivers better results.
                     </p>

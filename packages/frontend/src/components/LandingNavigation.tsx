@@ -11,30 +11,32 @@ export function LandingNavigation() {
       {/* Center Bottom CTAs */}
       <div className="absolute bottom-10 left-0 right-0 pointer-events-auto">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-4xl mx-auto">
-            {/* Publisher CTA */}
-            <Link href="/publishers" className="w-full sm:w-auto">
-              <Button
-                variant="glass-dark"
-                size="lg"
-                className="w-full sm:w-auto min-w-[240px] h-14 text-base font-semibold group hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl"
-              >
-                <Globe className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                Monetize Your Site
-              </Button>
-            </Link>
+          <div className="flex flex-col items-center justify-center gap-4 max-w-4xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
+              {/* Publisher CTA */}
+              <Link href="/publishers" className="w-full sm:w-auto">
+                <Button
+                  variant="glass-dark"
+                  size="lg"
+                  className="w-full sm:w-auto min-w-[240px] h-14 text-base font-semibold group hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl"
+                >
+                  <Globe className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  Start Publishing
+                </Button>
+              </Link>
 
-            {/* Advertiser CTA */}
-            <Link href="/advertisers" className="w-full sm:w-auto">
-              <Button
-                variant="glass-dark"
-                size="lg"
-                className="w-full sm:w-auto min-w-[240px] h-14 text-base font-semibold group hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl"
-              >
-                <Megaphone className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                Run Ad Campaigns
-              </Button>
-            </Link>
+              {/* Advertiser CTA */}
+              <Link href="/advertisers" className="w-full sm:w-auto">
+                <Button
+                  variant="glass-dark"
+                  size="lg"
+                  className="w-full sm:w-auto min-w-[240px] h-14 text-base font-semibold group hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-3xl"
+                >
+                  <Megaphone className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  Launch Campaign
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
