@@ -65,15 +65,7 @@ export default function PublishersPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        backgroundImage: "url('/bg.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="min-h-screen flex items-center justify-center p-4 bg-frosted-dark">
       <div className="w-full max-w-md mx-auto">
         <GlassCard variant="dark" blur="xl" className="p-8">
           <h1 className="text-3xl font-normal text-white mb-2">
@@ -169,8 +161,8 @@ export default function PublishersPage() {
           )}
 
           <div className="mt-8 pt-8 border-t border-white/10">
-            <h3 className="text-lg font-semibold mb-4 text-white">Benefits of Publishing with Buzzer Network</h3>
-            <ul className="space-y-2 text-white/60">
+            <h3 className="text-lg font-semibold mb-4 text-white">Benefits of Publishing with BUZZ</h3>
+            <ul className="space-y-2 text-white/80">
               <li>✓ 85% revenue share (vs 30-40% from traditional networks)</li>
               <li>✓ Instant crypto payments (no net-30 delays)</li>
               <li>✓ Transparent on-chain records</li>
