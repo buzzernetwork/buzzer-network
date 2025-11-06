@@ -12,7 +12,6 @@ import publisherRoutes from './routes/publishers.routes.js';
 import advertiserRoutes from './routes/advertisers.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import campaignRoutes from './routes/campaigns.routes.js';
-import scraperRoutes from './routes/scraper.routes.js';
 import { testDatabaseConnection } from './config/database.js';
 
 dotenv.config();
@@ -47,7 +46,6 @@ app.get('/api/v1', (req, res) => {
       publishers: '/api/v1/publishers',
       advertisers: '/api/v1/advertisers',
       tracking: '/track',
-      scraper: '/api/v1/scraper',
     }
   });
 });
@@ -59,7 +57,6 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/publishers', publisherRoutes);
 app.use('/api/v1/advertisers', advertiserRoutes);
 app.use('/api/v1/campaigns', campaignRoutes);
-app.use('/api/v1/scraper', scraperRoutes);
 
 // Start server
 app.listen(PORT, () => {
