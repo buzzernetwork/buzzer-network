@@ -9,8 +9,17 @@ const nextConfig = {
   images: {
     domains: ['i.pinimg.com', 'media.licdn.com', 'pbs.twimg.com'],
     unoptimized: false,
+    formats: ['image/avif', 'image/webp'],
   },
-  webpack: (config, { isServer }) => {
+  // Performance optimizations
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: true,
+  // Optimize chunk splitting
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-toast'],
+  },
+  webpack: (config, { isServer, webpack }) => {
     // Suppress optional dependency warnings (React Native and dev dependencies not needed for web)
     if (!isServer) {
       config.resolve.fallback = {
@@ -33,6 +42,21 @@ const nextConfig = {
       { module: /node_modules\/@walletconnect\/logger/ },
       { module: /node_modules\/pino/ },
     ];
+    
+    // Optimize chunk splitting - work with Next.js defaults, just add specific splits
+    if (!isServer && config.optimization?.splitChunks) {
+      const splitChunks = config.optimization.splitChunks;
+      if (splitChunks.cacheGroups) {
+        // Separate Three.js into its own chunk (loaded lazily)
+        splitChunks.cacheGroups.three = {
+          name: 'three',
+          test: /[\\/]node_modules[\\/](three|@react-three)[\\/]/,
+          priority: 30,
+          reuseExistingChunk: true,
+          chunks: 'async', // Only split async chunks (lazy loaded)
+        };
+      }
+    }
     
     return config;
   },

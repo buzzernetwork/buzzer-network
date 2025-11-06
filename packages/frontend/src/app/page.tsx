@@ -1,9 +1,26 @@
-import InfiniteGallery from "@/components/InfiniteGallery";
+import dynamic from "next/dynamic";
 import { LandingNavigation } from "@/components/LandingNavigation";
 import { GlassCard } from "@/components/GlassCard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Globe, Megaphone, TrendingUp, Shield, Zap, DollarSign } from "lucide-react";
+
+// Lazy load InfiniteGallery (Three.js is heavy, ~200KB)
+// This reduces initial bundle size by ~200KB
+const InfiniteGallery = dynamic(
+  () => import("@/components/InfiniteGallery"),
+  {
+    ssr: false, // Three.js requires browser APIs
+    loading: () => (
+      <div className="h-full w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-white/20 border-t-white/60 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="text-white/60 text-sm">Loading gallery...</div>
+        </div>
+      </div>
+    ),
+  }
+);
 
 export default function Home() {
   const sampleImages = [
