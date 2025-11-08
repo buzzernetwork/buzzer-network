@@ -75,6 +75,23 @@ export default function PublishersPage() {
             Monetize your website with crypto-native ads on BASE blockchain
           </p>
 
+          {/* Why Publish Card - Integrated into header */}
+          <div className="mb-8 p-6 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <Globe className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-white mb-2">Why Publish with Buzzer Network?</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  Join a transparent, crypto-native advertising network built on BASE blockchain. 
+                  Earn 85% of ad revenue with instant crypto payments directly to your wallet. 
+                  Our quality-focused network ensures your site is matched with premium advertisers.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {!isConnected && (
             <div className="mb-8">
               <p className="text-white/80 mb-4">Connect your wallet to get started:</p>
@@ -161,12 +178,14 @@ export default function PublishersPage() {
           )}
 
           <div className="mt-8 pt-8 border-t border-white/10">
-            <h3 className="text-lg font-semibold mb-4 text-white">Benefits of Publishing with BUZZ</h3>
+            <h3 className="text-lg font-semibold mb-4 text-white">Benefits of Publishing with Buzzer Network</h3>
             <ul className="space-y-2 text-white/80">
               <li>✓ 85% revenue share (vs 30-40% from traditional networks)</li>
               <li>✓ Instant crypto payments (no net-30 delays)</li>
               <li>✓ Transparent on-chain records</li>
               <li>✓ Quality-focused publisher network</li>
+              <li>✓ Domain verification ensures trust and quality</li>
+              <li>✓ Smart contract automation for fair distribution</li>
             </ul>
           </div>
         </GlassCard>

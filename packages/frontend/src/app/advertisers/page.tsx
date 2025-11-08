@@ -63,15 +63,7 @@ export default function AdvertisersPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        backgroundImage: "url('/bg.jpeg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+    <div className="min-h-screen flex items-center justify-center p-4 bg-frosted-dark">
       <div className="w-full max-w-md mx-auto">
         <GlassCard variant="dark" blur="xl" className="p-8">
           <h1 className="text-3xl font-normal text-white mb-2">
@@ -80,6 +72,23 @@ export default function AdvertisersPage() {
           <p className="text-white/60 mb-8">
             Reach quality audiences with crypto-native advertising on BASE blockchain
           </p>
+
+          {/* Why Advertise Card - Integrated into header */}
+          <div className="mb-8 p-6 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <Building2 className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-white mb-2">Why Advertise with Buzzer Network?</h3>
+                <p className="text-white/80 text-sm leading-relaxed">
+                  Reach quality publishers with transparent, on-chain advertising. Pay only 15% fees 
+                  (vs 30-40% elsewhere) and fund campaigns with crypto. Our matching engine connects 
+                  your ads with verified publishers automatically, ensuring better results and transparency.
+                </p>
+              </div>
+            </div>
+          </div>
 
           {!isConnected && (
             <div className="mb-8">
@@ -149,12 +158,14 @@ export default function AdvertisersPage() {
 
           <div className="mt-8 pt-8 border-t border-white/10">
             <h3 className="text-lg font-semibold mb-4 text-white">Benefits of Advertising with Buzzer Network</h3>
-            <ul className="space-y-2 text-white/60">
+            <ul className="space-y-2 text-white/80">
               <li>✓ Lower fees (15% vs 30-40% from traditional networks)</li>
               <li>✓ Instant payment processing</li>
               <li>✓ Direct publisher relationships</li>
               <li>✓ Transparent on-chain analytics</li>
               <li>✓ Quality-focused publisher network</li>
+              <li>✓ Advanced targeting and matching engine</li>
+              <li>✓ Crypto-native funding and settlements</li>
             </ul>
           </div>
         </GlassCard>
