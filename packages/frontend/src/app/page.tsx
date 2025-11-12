@@ -1,9 +1,5 @@
 import dynamic from "next/dynamic";
 import { LandingNavigation } from "@/components/LandingNavigation";
-import { GlassCard } from "@/components/GlassCard";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Globe, Megaphone, TrendingUp, Shield, Zap, DollarSign } from "lucide-react";
 
 // Lazy load InfiniteGallery (Three.js is heavy, ~200KB)
 // This reduces initial bundle size by ~200KB
@@ -12,7 +8,7 @@ const InfiniteGallery = dynamic(
   {
     ssr: false, // Three.js requires browser APIs
     loading: () => (
-      <div className="h-full w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+      <div className="h-full w-full bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-white/20 border-t-white/60 rounded-full animate-spin mx-auto mb-4"></div>
           <div className="text-white/60 text-sm">Loading gallery...</div>
@@ -90,159 +86,6 @@ export default function Home() {
         </div>
 
       </div>
-
-      {/* Scroll Section Below Gallery */}
-      <section className="min-h-screen bg-frosted-dark py-20">
-        <div className="container mx-auto px-4 max-w-6xl">
-          {/* How It Works */}
-          <div className="mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-4">
-              How It Works
-            </h2>
-            <p className="text-xl text-white/60 text-center mb-12 max-w-2xl mx-auto">
-              Three simple steps to connect advertisers with premium publishers
-            </p>
-            
-            <div className="grid md:grid-cols-3 gap-8">
-              <GlassCard variant="dark" blur="xl" className="p-8 text-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Globe className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-semibold text-white mb-4">Publishers</h3>
-                <p className="text-white/80 mb-6">
-                  Register your website, verify domain ownership, and start earning with premium ads
-                </p>
-                <Link href="/publishers">
-                  <Button variant="glass-dark" size="lg" className="w-full">
-                    Start Publishing
-                  </Button>
-                </Link>
-              </GlassCard>
-
-              <GlassCard variant="dark" blur="xl" className="p-8 text-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Megaphone className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-semibold text-white mb-4">Advertisers</h3>
-                <p className="text-white/80 mb-6">
-                  Create campaigns, set targeting, fund with crypto, and reach quality audiences
-                </p>
-                <Link href="/advertisers">
-                  <Button variant="glass-dark" size="lg" className="w-full">
-                    Launch Campaign
-                  </Button>
-                </Link>
-              </GlassCard>
-
-              <GlassCard variant="dark" blur="xl" className="p-8 text-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <TrendingUp className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-semibold text-white mb-4">Network</h3>
-                <p className="text-white/80 mb-6">
-                  Our matching engine connects the right ads with the right publishers automatically
-                </p>
-              </GlassCard>
-            </div>
-          </div>
-
-          {/* Benefits */}
-          <div>
-            <h2 className="text-4xl md:text-5xl font-bold text-white text-center mb-4">
-              Why Buzzer Network?
-            </h2>
-            <p className="text-xl text-white/60 text-center mb-12 max-w-2xl mx-auto">
-              Built for the decentralized web with transparency and fairness at its core
-            </p>
-
-            <div className="grid md:grid-cols-2 gap-8 mb-12">
-              <GlassCard variant="dark" blur="xl" className="p-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <DollarSign className="w-6 h-6 text-green-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-semibold text-white mb-2">Better Revenue Share</h3>
-                    <p className="text-white/80">
-                      Publishers earn 85% of ad revenue (vs 30-40% from traditional networks). 
-                      Advertisers pay only 15% fees (vs 30-40% elsewhere).
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
-
-              <GlassCard variant="dark" blur="xl" className="p-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-6 h-6 text-blue-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-semibold text-white mb-2">Instant Payments</h3>
-                    <p className="text-white/80">
-                      No net-30 delays. Publishers receive crypto payments directly to their wallet 
-                      with transparent on-chain records.
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
-
-              <GlassCard variant="dark" blur="xl" className="p-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-6 h-6 text-purple-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-semibold text-white mb-2">Transparent & Trustless</h3>
-                    <p className="text-white/80">
-                      All transactions are recorded on BASE blockchain. Smart contracts ensure 
-                      fair distribution without intermediaries.
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
-
-              <GlassCard variant="dark" blur="xl" className="p-8">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <TrendingUp className="w-6 h-6 text-yellow-300" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-semibold text-white mb-2">Quality Focused</h3>
-                    <p className="text-white/80">
-                      Domain verification ensures quality publishers. Advanced targeting and 
-                      matching engine delivers better results.
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
-            </div>
-
-            {/* Final CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/publishers">
-                <Button
-                  variant="glass-dark"
-                  size="lg"
-                  className="min-w-[240px] h-14 text-base font-semibold"
-                >
-                  <Globe className="w-5 h-5 mr-2" />
-                  Start Publishing
-                </Button>
-              </Link>
-              <Link href="/advertisers">
-                <Button
-                  variant="glass-dark"
-                  size="lg"
-                  className="min-w-[240px] h-14 text-base font-semibold"
-                >
-                  <Megaphone className="w-5 h-5 mr-2" />
-                  Launch Campaign
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
