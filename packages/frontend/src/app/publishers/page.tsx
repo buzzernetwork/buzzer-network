@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useSignMessage } from "wagmi";
 import { authenticateWithWallet, getAuthToken } from "@/lib/auth";
@@ -29,6 +29,7 @@ export default function PublishersPage() {
     website_url?: string;
     payment_wallet?: string;
   }>({});
+  const [prefetchingToken, setPrefetchingToken] = useState(false);
 
   // Validate URL format
   const validateURL = (url: string): boolean => {
@@ -75,6 +76,86 @@ export default function PublishersPage() {
     });
     return true;
   };
+
+  // Prefetch verification token when user enters website URL and is authenticated
+  useEffect(() => {
+    async function prefetchVerificationData() {
+      // Only prefetch if:
+      // 1. User is connected
+      // 2. Website URL is provided and looks valid (starts with http)
+      // 3. Not already prefetching
+      if (
+        !isConnected ||
+        !address ||
+        !formData.website_url ||
+        prefetchingToken
+      ) {
+        return;
+      }
+
+      // Simple URL validation check (starts with http/https)
+      if (
+        !formData.website_url.startsWith("http://") &&
+        !formData.website_url.startsWith("https://")
+      ) {
+        return;
+      }
+
+      const token = getAuthToken();
+      if (!token) {
+        // Try to authenticate silently
+        try {
+          await authenticateWithWallet(address, signMessageAsync as any);
+        } catch {
+          // If auth fails, user will need to submit form
+          return;
+        }
+      }
+
+      const authToken = getAuthToken();
+      if (!authToken) return;
+
+      // Check if publisher exists and prefetch token
+      try {
+        setPrefetchingToken(true);
+        const publisherResult = await api.getPublisher(authToken);
+
+        if (publisherResult.publisher?.id) {
+          // Publisher exists, prefetch verification token
+          const tokenResult = await api.getVerificationToken(
+            publisherResult.publisher.id,
+            authToken
+          );
+
+          // Cache it in sessionStorage
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem(
+              `verification_token_${publisherResult.publisher.id}`,
+              tokenResult.verification_token
+            );
+          }
+        }
+      } catch (error) {
+        // Publisher doesn't exist yet or other error - that's fine
+        // We'll handle it on form submit
+      } finally {
+        setPrefetchingToken(false);
+      }
+    }
+
+    // Debounce the prefetch check
+    const timeoutId = setTimeout(() => {
+      prefetchVerificationData();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    formData.website_url,
+    isConnected,
+    address,
+    signMessageAsync,
+    prefetchingToken,
+  ]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,23 +232,56 @@ export default function PublishersPage() {
           );
         });
 
-      // Auto-redirect to verification page after 1 second
-      setTimeout(() => {
-        router.push("/publishers/verify");
-      }, 1000);
+      // Auto-redirect to verification page immediately (no delay)
+      router.push("/publishers/verify");
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Registration failed";
 
-      // Handle duplicate registration gracefully
+      // Handle duplicate registration gracefully - redirect immediately
       if (
         errorMessage.includes("already exists") ||
         errorMessage.includes("409")
       ) {
-        setError("You're already registered. Redirecting to verification...");
-        setTimeout(() => {
-          router.push("/publishers/verify");
-        }, 2000);
+        // Get token for prefetching
+        const authToken = getAuthToken();
+
+        // Try to get publisher info and prefetch token if not already cached
+        // Do this in background, don't wait for it
+        if (authToken) {
+          (async () => {
+            try {
+              const publisherResult = await api.getPublisher(authToken);
+              if (publisherResult.publisher?.id) {
+                // Check if token is already cached
+                const cachedToken = sessionStorage.getItem(
+                  `verification_token_${publisherResult.publisher.id}`
+                );
+
+                if (!cachedToken) {
+                  // Prefetch token (in background, don't block redirect)
+                  const tokenResult = await api.getVerificationToken(
+                    publisherResult.publisher.id,
+                    authToken
+                  );
+                  sessionStorage.setItem(
+                    `verification_token_${publisherResult.publisher.id}`,
+                    tokenResult.verification_token
+                  );
+                }
+              }
+            } catch (prefetchError) {
+              // If prefetch fails, still redirect - verification page will fetch it
+              console.log(
+                "Prefetch failed, will fetch on verification page:",
+                prefetchError
+              );
+            }
+          })();
+        }
+
+        // Redirect immediately (no delay, no error message)
+        router.push("/publishers/verify");
         return;
       }
 
@@ -179,80 +293,101 @@ export default function PublishersPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-frosted-dark pt-24">
-      <div className="w-full max-w-md mx-auto">
-        <GlassCard variant="dark" blur="xl" className="p-8">
-          <h1 className="text-3xl font-bold text-white mb-2 scroll-mt-24">
-            Become a Publisher
+      <div className="w-full max-w-4xl mx-auto">
+        <GlassCard variant="dark" blur="xl" className="p-6 md:p-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 scroll-mt-24 leading-tight">
+            Earn more from your website.
           </h1>
-          <p className="text-white/60 mb-8">
-            Monetize your website with crypto-native ads on BASE blockchain
+          <p className="text-base md:text-lg text-white/70 mb-10 leading-relaxed">
+            Keep 85% of ad revenue. Get paid instantly. No middlemen.
           </p>
 
-          {/* How It Works */}
-          <section
-            className="mb-8 p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl"
-            aria-labelledby="how-it-works-heading"
-          >
-            <h2
-              id="how-it-works-heading"
-              className="text-xl font-semibold text-white mb-4"
+          {/* Desktop: Two-column layout, Mobile: Stacked */}
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {/* How It Works */}
+            <section
+              className="p-6 md:p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl"
+              aria-labelledby="how-it-works-heading"
             >
-              How It Works
-            </h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-white font-medium mb-1">
-                    Register Your Website
-                  </h3>
-                  <p className="text-white/80 text-sm">
-                    Sign up with your website URL and connect your wallet
-                  </p>
+              <h2
+                id="how-it-works-heading"
+                className="text-xl md:text-2xl font-semibold text-white mb-6"
+              >
+                How It Works
+              </h2>
+              <div className="space-y-5">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 mt-0.5 flex items-center justify-center">
+                    <CheckCircle2
+                      className="w-6 h-6 text-green-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-semibold mb-2 text-base">
+                      Add your website
+                    </h3>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      Connect your wallet and share your website URL. That's it.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 mt-0.5 flex items-center justify-center">
+                    <CheckCircle2
+                      className="w-6 h-6 text-green-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-semibold mb-2 text-base">
+                      Verify ownership
+                    </h3>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      Prove you own your site. Takes seconds. Ensures quality
+                      for everyone.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 mt-0.5 flex items-center justify-center">
+                    <CheckCircle2
+                      className="w-6 h-6 text-green-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-semibold mb-2 text-base">
+                      Start earning
+                    </h3>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      Ads appear automatically. Money arrives instantly. No
+                      waiting, no delays.
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-white font-medium mb-1">
-                    Verify Domain Ownership
-                  </h3>
-                  <p className="text-white/80 text-sm">
-                    Complete domain verification to ensure quality and trust
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-white font-medium mb-1">Start Earning</h3>
-                  <p className="text-white/80 text-sm">
-                    Our matching engine automatically connects you with premium
-                    ads and you start earning with instant crypto payments
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Why Publish Card - Integrated into header */}
-          <section
-            className="mb-8 p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl"
-            aria-labelledby="why-publish-heading"
-          >
-            <h2
-              id="why-publish-heading"
-              className="text-xl font-semibold text-white mb-2"
+            {/* Why Publish Card */}
+            <section
+              className="p-6 md:p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl"
+              aria-labelledby="why-publish-heading"
             >
-              Why Publish with Buzzer Network?
-            </h2>
-            <p className="text-white/80 text-sm leading-relaxed">
-              Join a transparent, crypto-native advertising network built on
-              BASE blockchain. Earn 85% of ad revenue with instant crypto
-              payments directly to your wallet. Our quality-focused network
-              ensures your site is matched with premium advertisers.
-            </p>
-          </section>
+              <h2
+                id="why-publish-heading"
+                className="text-xl md:text-2xl font-semibold text-white mb-4"
+              >
+                Why publish with us?
+              </h2>
+              <p className="text-white/80 text-sm md:text-base leading-relaxed">
+                You keep 85% of every dollar. Traditional networks take 60–70%.
+                Payments arrive instantly, not in 30 days. Every transaction is
+                verified and transparent. No hidden fees. No middlemen. Just
+                you, your audience, and better earnings.
+              </p>
+            </section>
+          </div>
 
           {!isConnected && (
             <div className="mb-8">
@@ -266,14 +401,20 @@ export default function PublishersPage() {
           {isConnected && (
             <form
               onSubmit={handleSubmit}
-              className="space-y-6"
+              className="space-y-6 max-w-2xl mx-auto"
               aria-label="Publisher registration form"
             >
               {/* Step 1: Email - Always visible */}
               <div className="relative animate-in fade-in duration-300">
-                <Label htmlFor="email" className="text-white/80 mb-2 block">
+                <Label
+                  htmlFor="email"
+                  className="text-white font-medium mb-3 block text-base"
+                >
                   Email{" "}
-                  <span className="text-white/60" aria-label="required">
+                  <span
+                    className="text-white/60 font-normal"
+                    aria-label="required"
+                  >
                     *
                   </span>
                 </Label>
@@ -306,10 +447,13 @@ export default function PublishersPage() {
                 <div className="relative animate-in fade-in slide-in-from-top-2 duration-300">
                   <Label
                     htmlFor="website_url"
-                    className="text-white/80 mb-2 block"
+                    className="text-white font-medium mb-3 block text-base"
                   >
                     Website URL{" "}
-                    <span className="text-white/60" aria-label="required">
+                    <span
+                      className="text-white/60 font-normal"
+                      aria-label="required"
+                    >
                       *
                     </span>
                   </Label>
@@ -340,7 +484,11 @@ export default function PublishersPage() {
                     />
                   </div>
                   {validationErrors.website_url && (
-                    <p className="mt-1 text-sm text-red-300" role="alert">
+                    <p
+                      className="mt-2 text-sm text-red-400 font-medium"
+                      role="alert"
+                      aria-live="polite"
+                    >
                       {validationErrors.website_url}
                     </p>
                   )}
@@ -352,7 +500,7 @@ export default function PublishersPage() {
                 <div className="relative animate-in fade-in slide-in-from-top-2 duration-300">
                   <Label
                     htmlFor="payment_wallet"
-                    className="text-white/80 mb-2 block"
+                    className="text-white font-medium mb-3 block text-base"
                   >
                     Payment Wallet Address
                   </Label>
@@ -386,13 +534,17 @@ export default function PublishersPage() {
                     />
                   </div>
                   {validationErrors.payment_wallet && (
-                    <p className="mt-1 text-sm text-red-300" role="alert">
+                    <p
+                      className="mt-2 text-sm text-red-400 font-medium"
+                      role="alert"
+                      aria-live="polite"
+                    >
                       {validationErrors.payment_wallet}
                     </p>
                   )}
                   <p
                     id="payment_wallet-help"
-                    className="mt-1 text-sm text-white/60"
+                    className="mt-2 text-sm text-white/70"
                   >
                     Leave empty to use connected wallet address
                   </p>
@@ -450,17 +602,85 @@ export default function PublishersPage() {
           >
             <h2
               id="benefits-heading"
-              className="text-lg font-semibold mb-4 text-white"
+              className="text-lg md:text-xl font-semibold mb-5 text-white"
             >
               Benefits of Publishing with Buzzer Network
             </h2>
-            <ul className="space-y-2 text-white/80" role="list">
-              <li>✓ 85% revenue share (vs 30-40% from traditional networks)</li>
-              <li>✓ Instant crypto payments (no net-30 delays)</li>
-              <li>✓ Transparent on-chain records</li>
-              <li>✓ Quality-focused publisher network</li>
-              <li>✓ Domain verification ensures trust and quality</li>
-              <li>✓ Smart contract automation for fair distribution</li>
+            <ul
+              className="space-y-3 text-white/80 text-sm md:text-base leading-relaxed"
+              role="list"
+            >
+              <li className="flex items-start gap-3">
+                <span
+                  className="text-green-400 font-semibold mt-0.5 flex-shrink-0"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+                <span>
+                  Earn 85% of revenue. Traditional networks keep 60–70%.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span
+                  className="text-green-400 font-semibold mt-0.5 flex-shrink-0"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+                <span>
+                  Get paid instantly. No 30-day waits. Money arrives when you
+                  earn it.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span
+                  className="text-green-400 font-semibold mt-0.5 flex-shrink-0"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+                <span>
+                  See every transaction. All payments are verified and
+                  transparent.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span
+                  className="text-green-400 font-semibold mt-0.5 flex-shrink-0"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+                <span>
+                  Connect with quality advertisers. We verify every publisher
+                  and advertiser.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span
+                  className="text-green-400 font-semibold mt-0.5 flex-shrink-0"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+                <span>
+                  Protect against fraud. Every impression is verified, so you
+                  only get real traffic.
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span
+                  className="text-green-400 font-semibold mt-0.5 flex-shrink-0"
+                  aria-hidden="true"
+                >
+                  ✓
+                </span>
+                <span>
+                  No middlemen. Direct relationships mean more money stays with
+                  you.
+                </span>
+              </li>
             </ul>
           </section>
         </GlassCard>

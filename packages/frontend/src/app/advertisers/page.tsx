@@ -65,58 +65,67 @@ export default function AdvertisersPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-frosted-dark pt-24">
-      <div className="w-full max-w-md mx-auto">
-        <GlassCard variant="dark" blur="xl" className="p-8">
-          <h1 className="text-3xl font-bold text-white mb-2 scroll-mt-24">
-            Become an Advertiser
+      <div className="w-full max-w-4xl mx-auto">
+        <GlassCard variant="dark" blur="xl" className="p-6 md:p-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 scroll-mt-24 leading-tight">
+            Better ads. Lower costs.
           </h1>
-          <p className="text-white/60 mb-8">
-            Reach quality audiences with crypto-native advertising on BASE blockchain
+          <p className="text-base md:text-lg text-white/70 mb-10 leading-relaxed">
+            Pay 15% fees instead of 30–40%. Reach real audiences. See exactly where your money goes.
           </p>
 
-          {/* How It Works */}
-          <section className="mb-8 p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl" aria-labelledby="how-it-works-heading">
-            <h2 id="how-it-works-heading" className="text-xl font-semibold text-white mb-4">How It Works</h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-white font-medium mb-1">Create Campaigns</h3>
-                  <p className="text-white/80 text-sm">
-                    Set up your campaign with targeting options and creative assets
-                  </p>
+          {/* Desktop: Two-column layout, Mobile: Stacked */}
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {/* How It Works */}
+            <section className="p-6 md:p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl" aria-labelledby="how-it-works-heading">
+              <h2 id="how-it-works-heading" className="text-xl md:text-2xl font-semibold text-white mb-6">How It Works</h2>
+              <div className="space-y-5">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 mt-0.5 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-400" aria-hidden="true" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-semibold mb-2 text-base">Create your campaign</h3>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      Choose your audience, set your budget, upload your creative. Simple.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 mt-0.5 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-400" aria-hidden="true" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-semibold mb-2 text-base">Fund instantly</h3>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      Pay with crypto. No credit cards. No bank delays. Your campaign starts immediately.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 mt-0.5 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-green-400" aria-hidden="true" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-semibold mb-2 text-base">Reach real people</h3>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      Your ads appear on verified sites with real audiences. Every impression is verified. No bots.
+                    </p>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-white font-medium mb-1">Fund with Crypto</h3>
-                  <p className="text-white/80 text-sm">
-                    Deposit funds using crypto on BASE blockchain for transparent payments
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h3 className="text-white font-medium mb-1">Reach Quality Audiences</h3>
-                  <p className="text-white/80 text-sm">
-                    Our matching engine automatically connects your ads with verified publishers to reach quality audiences
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Why Advertise Card - Integrated into header */}
-          <section className="mb-8 p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl" aria-labelledby="why-advertise-heading">
-            <h2 id="why-advertise-heading" className="text-xl font-semibold text-white mb-2">Why Advertise with Buzzer Network?</h2>
-            <p className="text-white/80 text-sm leading-relaxed">
-              Reach quality publishers with transparent, on-chain advertising. Pay only 15% fees 
-              (vs 30-40% elsewhere) and fund campaigns with crypto. Our matching engine connects 
-              your ads with verified publishers automatically, ensuring better results and transparency.
+            {/* Why Advertise Card */}
+            <section className="p-6 md:p-8 bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl" aria-labelledby="why-advertise-heading">
+            <h2 id="why-advertise-heading" className="text-xl md:text-2xl font-semibold text-white mb-4">Why advertise with us?</h2>
+            <p className="text-white/80 text-sm md:text-base leading-relaxed">
+              Pay 15% fees instead of 30–40%. That's real savings. Every impression is verified, 
+              so you only pay for real views. See exactly where your budget goes with transparent 
+              analytics. No hidden costs. No fraud. Just better results.
             </p>
-          </section>
+            </section>
+          </div>
 
           {!isConnected && (
             <div className="mb-8">
@@ -126,11 +135,11 @@ export default function AdvertisersPage() {
           )}
 
           {isConnected && (
-            <form onSubmit={handleSubmit} className="space-y-6" aria-label="Advertiser registration form">
+            <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto" aria-label="Advertiser registration form">
               {/* Step 1: Company Name - Always visible */}
               <div className="relative animate-in fade-in duration-300">
-                <Label htmlFor="company_name" className="text-white/80 mb-2 block">
-                  Company Name <span className="text-white/60" aria-label="required">*</span>
+                <Label htmlFor="company_name" className="text-white font-medium mb-3 block text-base">
+                  Company Name <span className="text-white/60 font-normal" aria-label="required">*</span>
                 </Label>
                 <div className="relative">
                   <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40 pointer-events-none z-10" aria-hidden="true" />
@@ -152,8 +161,8 @@ export default function AdvertisersPage() {
               {/* Step 2: Website URL - Show when company name is filled */}
               {formData.company_name && (
                 <div className="relative animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label htmlFor="website_url" className="text-white/80 mb-2 block">
-                    Website URL <span className="text-white/60">(Optional)</span>
+                  <Label htmlFor="website_url" className="text-white font-medium mb-3 block text-base">
+                    Website URL <span className="text-white/60 font-normal">(Optional)</span>
                   </Label>
                   <div className="relative">
                     <Globe className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40 pointer-events-none z-10" aria-hidden="true" />
@@ -197,15 +206,32 @@ export default function AdvertisersPage() {
           )}
 
           <section className="mt-8 pt-8 border-t border-white/10" aria-labelledby="benefits-heading">
-            <h2 id="benefits-heading" className="text-lg font-semibold mb-4 text-white">Benefits of Advertising with Buzzer Network</h2>
-            <ul className="space-y-2 text-white/80" role="list">
-              <li>✓ Lower fees (15% vs 30-40% from traditional networks)</li>
-              <li>✓ Instant payment processing</li>
-              <li>✓ Direct publisher relationships</li>
-              <li>✓ Transparent on-chain analytics</li>
-              <li>✓ Quality-focused publisher network</li>
-              <li>✓ Advanced targeting and matching engine</li>
-              <li>✓ Crypto-native funding and settlements</li>
+            <h2 id="benefits-heading" className="text-lg md:text-xl font-semibold mb-5 text-white">Benefits of Advertising with Buzzer Network</h2>
+            <ul className="space-y-3 text-white/80 text-sm md:text-base leading-relaxed" role="list">
+              <li className="flex items-start gap-3">
+                <span className="text-green-400 font-semibold mt-0.5 flex-shrink-0" aria-hidden="true">✓</span>
+                <span>Save 50% on fees. Pay 15% instead of 30–40%.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-400 font-semibold mt-0.5 flex-shrink-0" aria-hidden="true">✓</span>
+                <span>Stop fraud before it costs you. Every impression is verified.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-400 font-semibold mt-0.5 flex-shrink-0" aria-hidden="true">✓</span>
+                <span>See exactly where your money goes. Full transparency, always.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-400 font-semibold mt-0.5 flex-shrink-0" aria-hidden="true">✓</span>
+                <span>Reach verified publishers. Real sites. Real audiences.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-400 font-semibold mt-0.5 flex-shrink-0" aria-hidden="true">✓</span>
+                <span>Launch campaigns instantly. No credit cards. No delays.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-green-400 font-semibold mt-0.5 flex-shrink-0" aria-hidden="true">✓</span>
+                <span>Connect directly with publishers. No middlemen taking cuts.</span>
+              </li>
             </ul>
           </section>
         </GlassCard>
