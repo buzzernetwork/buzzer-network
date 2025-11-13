@@ -9,6 +9,7 @@ import { GlassCard } from '@/components/GlassCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert } from '@/components/ui/alert';
 
 export default function NewCampaignPage() {
   const { address, isConnected } = useAccount();
@@ -96,11 +97,11 @@ export default function NewCampaignPage() {
 
   return (
     <div
-      className="min-h-screen py-8 bg-frosted-dark"
+      className="min-h-screen py-8 bg-frosted-dark pt-24"
     >
       <div className="container mx-auto px-4 max-w-4xl">
         <GlassCard variant="dark" blur="xl" className="p-8">
-          <h1 className="text-3xl font-bold text-white mb-8">Create New Campaign</h1>
+          <h1 className="text-3xl font-bold text-white mb-8 scroll-mt-24">Create New Campaign</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Campaign Basics */}
@@ -132,7 +133,7 @@ export default function NewCampaignPage() {
                     required
                     value={formData.objective}
                     onChange={(e) => setFormData({ ...formData, objective: e.target.value as any })}
-                    className="w-full h-14 bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl text-white placeholder:text-white/40 focus:border-white/30 focus:ring-0 px-4 text-base transition-all duration-200 hover:bg-black/30 focus:bg-black/30"
+                    className="w-full h-14 bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl text-white placeholder:text-white/60 focus:border-white/30 focus:ring-0 px-4 text-base transition-all duration-200 hover:bg-black/30 focus:bg-black/30"
                   >
                     <option value="awareness">Awareness</option>
                     <option value="clicks">Clicks</option>
@@ -149,7 +150,7 @@ export default function NewCampaignPage() {
                     required
                     value={formData.bid_model}
                     onChange={(e) => setFormData({ ...formData, bid_model: e.target.value as any })}
-                    className="w-full h-14 bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl text-white placeholder:text-white/40 focus:border-white/30 focus:ring-0 px-4 text-base transition-all duration-200 hover:bg-black/30 focus:bg-black/30"
+                    className="w-full h-14 bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl text-white placeholder:text-white/60 focus:border-white/30 focus:ring-0 px-4 text-base transition-all duration-200 hover:bg-black/30 focus:bg-black/30"
                   >
                     <option value="CPM">CPM (Cost Per Mille)</option>
                     <option value="CPC">CPC (Cost Per Click)</option>
@@ -209,7 +210,7 @@ export default function NewCampaignPage() {
                   onChange={(e) => setFormData({ ...formData, bid_amount: e.target.value })}
                   placeholder="0.01"
                 />
-                <p className="mt-1 text-sm text-white/40">
+                <p className="mt-1 text-sm text-white/60">
                   {formData.bid_model === 'CPM' ? 'Per 1,000 impressions' : 'Per click'}
                 </p>
               </div>
@@ -232,7 +233,7 @@ export default function NewCampaignPage() {
                   onChange={(e) => setFormData({ ...formData, creative_url: e.target.value })}
                   placeholder="https://..."
                 />
-                <p className="mt-1 text-sm text-white/40">
+                <p className="mt-1 text-sm text-white/60">
                   Upload to IPFS or use CDN URL
                 </p>
               </div>
@@ -254,9 +255,9 @@ export default function NewCampaignPage() {
             </div>
 
             {error && (
-              <div className="bg-red-500/20 backdrop-blur-sm border border-red-500/30 text-red-200 px-4 py-3 rounded-2xl">
+              <Alert variant="error">
                 {error}
-              </div>
+              </Alert>
             )}
 
             <div className="flex gap-4">

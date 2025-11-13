@@ -44,15 +44,17 @@ module.exports = {
         ring: 'var(--ring)',
       },
       borderRadius: {
-        sm: 'var(--radius-sm)',
-        md: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
-        xl: 'var(--radius-xl)',
+        xs: '0.25rem',   /* 4px */
+        sm: '0.5rem',    /* 8px */
+        md: '0.75rem',   /* 12px */
+        lg: '1rem',      /* 16px */
+        xl: '1.5rem',    /* 24px */
+        '2xl': '2rem',   /* 32px */
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
-        serif: ['var(--font-serif)', 'serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
+        mono: ['var(--font-geist-mono)', 'monospace'],
+        serif: ['var(--font-instrument)', 'serif'],
       },
       spacing: {
         xs: 'var(--spacing-xs)',

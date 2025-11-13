@@ -10,56 +10,72 @@ async function fetchAPI(
   options: RequestInit = {}
 ): Promise<any> {
   const url = `${API_URL}${endpoint}`;
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
-
-  // Check content type before parsing
-  const contentType = response.headers.get('content-type');
-  const isJSON = contentType?.includes('application/json');
-
-  if (!response.ok) {
-    let errorMessage = `HTTP ${response.status}`;
+  
+  // Add timeout (10 seconds)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
     
-    // Try to parse JSON error response
-    if (isJSON) {
-      try {
-        const error = await response.json();
-        errorMessage = error.error || error.message || errorMessage;
-      } catch {
-        // JSON parsing failed, use default message
-      }
-    } else {
-      // For non-JSON errors (HTML pages, etc.), try to get text
-      try {
-        const text = await response.text();
-        // Only use text if it's short and looks like an error message
-        if (text.length < 200 && !text.includes('<!DOCTYPE')) {
-          errorMessage = text;
+    clearTimeout(timeoutId);
+
+    // Check content type before parsing
+    const contentType = response.headers.get('content-type');
+    const isJSON = contentType?.includes('application/json');
+
+    if (!response.ok) {
+      let errorMessage = `HTTP ${response.status}`;
+      
+      // Try to parse JSON error response
+      if (isJSON) {
+        try {
+          const error = await response.json();
+          errorMessage = error.error || error.message || errorMessage;
+        } catch {
+          // JSON parsing failed, use default message
         }
-      } catch {
-        // Ignore text parsing errors
+      } else {
+        // For non-JSON errors (HTML pages, etc.), try to get text
+        try {
+          const text = await response.text();
+          // Only use text if it's short and looks like an error message
+          if (text.length < 200 && !text.includes('<!DOCTYPE')) {
+            errorMessage = text;
+          }
+        } catch {
+          // Ignore text parsing errors
+        }
       }
+      
+      throw new Error(errorMessage);
     }
-    
-    throw new Error(errorMessage);
-  }
 
-  // Validate that we received JSON before parsing
-  if (!isJSON) {
-    const text = await response.text();
-    throw new Error(
-      `Expected JSON response but received ${contentType || 'unknown type'}. ` +
-      `This usually means the backend server is not running or the endpoint doesn't exist. ` +
-      `URL: ${url}`
-    );
-  }
+    // Validate that we received JSON before parsing
+    if (!isJSON) {
+      const text = await response.text();
+      throw new Error(
+        `Expected JSON response but received ${contentType || 'unknown type'}. ` +
+        `This usually means the backend server is not running or the endpoint doesn't exist. ` +
+        `URL: ${url}`
+      );
+    }
 
-  return response.json();
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timeout: The server took too long to respond. Please try again.');
+    }
+    throw error;
+  }
 }
 
 export const api = {
@@ -109,16 +125,34 @@ export const api = {
     });
   },
 
-  async getVerificationToken(publisherId: string, token: string) {
-    return fetchAPI(`/api/v1/publishers/${publisherId}/verification-token`, {
+  async getPublisherDomains(publisherId: string, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/domains`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
   },
 
-  async verifyDomain(publisherId: string, method: string, token: string, verificationToken?: string) {
-    return fetchAPI(`/api/v1/publishers/${publisherId}/verify`, {
+  async addPublisherDomain(publisherId: string, data: { website_url: string }, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/domains`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getDomainVerificationToken(publisherId: string, domainId: string, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/domains/${domainId}/verification-token`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async verifyDomain(publisherId: string, domainId: string, method: string, token: string, verificationToken?: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/domains/${domainId}/verify`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -127,6 +161,15 @@ export const api = {
         verification_method: method,
         verification_token: verificationToken,
       }),
+    });
+  },
+
+  async verifyDomainNow(publisherId: string, domainId: string, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/domains/${domainId}/verify-now`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
   },
 
@@ -237,9 +280,103 @@ export const api = {
     });
   },
 
-  // Scraper/Gallery
-  async getMemeGallery() {
-    return fetchAPI('/api/v1/scraper/gallery');
+  // Ad Slots
+  async getIABAdSizes() {
+    return fetchAPI('/api/v1/ad-sizes');
+  },
+
+  async createSlot(publisherId: string, data: {
+    name: string;
+    path?: string;
+    format: 'banner' | 'native' | 'video';
+    sizes: string[];
+    primary_size: string;
+    position?: 'above_fold' | 'below_fold' | 'sidebar' | 'footer';
+    refresh_enabled?: boolean;
+    refresh_interval?: number;
+    lazy_load?: boolean;
+    viewability_threshold?: number;
+    floor_price?: number;
+  }, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getSlots(publisherId: string, params: {
+    status?: 'active' | 'paused' | 'archived';
+    format?: 'banner' | 'native' | 'video';
+    limit?: number;
+    offset?: number;
+  }, token: string) {
+    const queryParams = new URLSearchParams();
+    if (params.status) queryParams.set('status', params.status);
+    if (params.format) queryParams.set('format', params.format);
+    if (params.limit) queryParams.set('limit', params.limit.toString());
+    if (params.offset) queryParams.set('offset', params.offset.toString());
+
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots?${queryParams}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async getSlot(publisherId: string, slotId: string, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/${slotId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async updateSlot(publisherId: string, slotId: string, data: {
+    name?: string;
+    path?: string;
+    sizes?: string[];
+    primary_size?: string;
+    position?: 'above_fold' | 'below_fold' | 'sidebar' | 'footer';
+    refresh_enabled?: boolean;
+    refresh_interval?: number;
+    lazy_load?: boolean;
+    viewability_threshold?: number;
+    floor_price?: number;
+  }, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/${slotId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async updateSlotStatus(publisherId: string, slotId: string, status: 'active' | 'paused' | 'archived', token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/${slotId}/status`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  async getSlotTestPage(publisherId: string, slotId: string, token: string): Promise<string> {
+    const response = await fetch(`${API_URL}/api/v1/publishers/${publisherId}/slots/${slotId}/test-page`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return response.text();
   },
 };
 

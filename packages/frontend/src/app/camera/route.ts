@@ -4,15 +4,15 @@
  * This is a simple health check endpoint
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function GET() {
   // Return a simple response for Coinbase Wallet SDK COOP check
   return new NextResponse(null, {
     status: 200,
     headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-      'Cross-Origin-Embedder-Policy': 'unsafe-none',
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+      "Cross-Origin-Embedder-Policy": "unsafe-none",
     },
   });
 }
@@ -22,9 +22,11 @@ export async function HEAD() {
   return new NextResponse(null, {
     status: 200,
     headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-      'Cross-Origin-Embedder-Policy': 'unsafe-none',
+      "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+      "Cross-Origin-Embedder-Policy": "unsafe-none",
     },
   });
 }
+
+
 

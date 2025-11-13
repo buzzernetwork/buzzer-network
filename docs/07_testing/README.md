@@ -1,12 +1,17 @@
 # Testing Documentation
 
-This directory contains test results and testing scripts.
+This directory contains test results, testing scripts, and testing guides.
 
 ## Test Reports
 
-- **TEST_REPORT.md** - Detailed API endpoint test results
-- **ENDPOINT_TEST_SUMMARY.md** - Summary of all endpoint tests
+- **ENDPOINT_TEST_SUMMARY.md** - Summary of all endpoint tests (consolidated test report)
 - **CORE_FLOW_TEST_RESULTS.md** - End-to-end user journey flow test results
+- **PUBLISHER_REGISTRATION_AUDIT.md** - Publisher registration audit results
+
+## Testing Guides
+
+- **TESTING_GUIDE.md** - Step-by-step testing guide for all features
+- **CUSTOMER_JOURNEY_ENDPOINTS.md** - Complete customer journey with all endpoints
 
 ## Test Scripts
 
@@ -31,6 +36,11 @@ cd packages/backend
 npm run test:flow
 ```
 
+### Customer Journey Tests
+```bash
+node test-customer-journey.js
+```
+
 ## Test Coverage
 
 - ✅ Health & system endpoints
@@ -40,4 +50,7 @@ npm run test:flow
 - ✅ Publisher endpoints
 - ✅ Advertiser endpoints
 - ✅ Campaign endpoints
+- ✅ Complete customer journeys (advertiser & publisher flows)
+
+
 

@@ -33,3 +33,6 @@ npm run migrate:rollback
 - If TimescaleDB is not available, tables work as regular PostgreSQL tables
 - All migrations include proper indexes for performance
 
+
+
+

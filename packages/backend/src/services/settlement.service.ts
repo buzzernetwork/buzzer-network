@@ -111,11 +111,15 @@ export async function processDailySettlement(
   const results: SettlementResult[] = [];
 
   try {
-    // Get all approved publishers
+    // Get all approved publishers with at least one verified domain
     const publishers = await dbPool.query(
-      `SELECT id, payment_wallet, wallet_address 
-       FROM publishers 
-       WHERE status = 'approved' AND domain_verified = true`
+      `SELECT DISTINCT p.id, p.payment_wallet, p.wallet_address 
+       FROM publishers p
+       WHERE p.status = 'approved' 
+         AND EXISTS (
+           SELECT 1 FROM publisher_domains pd 
+           WHERE pd.publisher_id = p.id AND pd.domain_verified = true
+         )`
     );
 
     // Calculate settlement period (previous day)

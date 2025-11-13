@@ -7,6 +7,7 @@ import dns from 'dns/promises';
 import https from 'https';
 import http from 'http';
 import { URL } from 'url';
+import crypto from 'crypto';
 
 export interface VerificationResult {
   success: boolean;
@@ -143,13 +144,15 @@ export async function verifyFile(
 }
 
 /**
- * Generate verification token for publisher
+ * Generate verification token for domain
+ * Includes domain ID for uniqueness per domain
  */
-export function generateVerificationToken(publisherId: string, walletAddress: string): string {
-  // Generate a unique token based on publisher ID and wallet
-  const hash = require('crypto')
+export function generateVerificationToken(domainId: string, walletAddress: string): string {
+  // Generate a unique token based on domain ID and wallet
+  // Domain ID ensures each domain gets a unique token
+  const hash = crypto
     .createHash('sha256')
-    .update(`${publisherId}-${walletAddress}-${Date.now()}`)
+    .update(`${domainId}-${walletAddress}-${Date.now()}`)
     .digest('hex')
     .substring(0, 16);
   

@@ -431,5 +431,292 @@ All endpoints may return these error responses:
 
 ---
 
-**Last Updated**: 2025-01-27
+## Conversion Tracking
+
+### POST `/track/conversion/:impressionId`
+
+Track a conversion event with attribution.
+
+**Parameters:**
+- `impressionId` - Impression ID from the original ad serve
+
+**Body:**
+```json
+{
+  "conversion_type": "purchase",
+  "conversion_value": "0.01",
+  "conversion_data": { "product_id": "123" },
+  "attribution_window_days": 30
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "conversion_id": "uuid",
+  "attributed": true,
+  "time_to_conversion_seconds": 3600,
+  "message": "Conversion tracked and attributed"
+}
+```
+
+---
+
+## Privacy Management
+
+### POST `/api/v1/privacy/opt-out`
+
+Opt-out from tracking (GDPR/CCPA).
+
+**Body:**
+```json
+{
+  "source": "user_request",
+  "duration_days": 365
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Successfully opted out of tracking",
+  "identifier": "abc12345"
+}
+```
+
+### GET `/api/v1/privacy/data/:identifier`
+
+Access personal data (GDPR Right to Access).
+
+**Parameters:**
+- `identifier` - User identifier or "me" for current user
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "impressions": [...],
+    "clicks": [...],
+    "conversions": [...],
+    "summary": {
+      "total_impressions": 100,
+      "total_clicks": 10,
+      "total_conversions": 2
+    }
+  }
+}
+```
+
+### DELETE `/api/v1/privacy/data/:identifier`
+
+Delete personal data (GDPR Right to Erasure).
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Personal data has been anonymized",
+  "records_anonymized": 112
+}
+```
+
+### GET `/api/v1/privacy/status`
+
+Check current privacy status.
+
+**Response:**
+```json
+{
+  "success": true,
+  "identifier": "abc12345",
+  "opted_out": false,
+  "opted_out_since": null,
+  "opt_out_source": null
+}
+```
+
+---
+
+## IVT Reporting
+
+### GET `/api/v1/reports/ivt`
+
+Get IVT summary report for TAG compliance.
+
+**Authentication:** Required
+
+**Query Parameters:**
+- `start_date` - Start date (YYYY-MM-DD)
+- `end_date` - End date (YYYY-MM-DD)
+- `format` - 'json' or 'csv' (default: json)
+
+**Response:**
+```json
+{
+  "success": true,
+  "period": {
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-31",
+    "days": 31
+  },
+  "summary": {
+    "averageInvalidTrafficRate": 3.2,
+    "averageGIVTRate": 2.1,
+    "averageSIVTRate": 1.1,
+    "totalTraffic": 1000000,
+    "totalInvalidTraffic": 32000
+  },
+  "daily_summaries": [...]
+}
+```
+
+### GET `/api/v1/reports/ivt/publishers`
+
+Get IVT report by publisher.
+
+**Authentication:** Required
+
+**Query Parameters:**
+- `start_date` - Start date (YYYY-MM-DD)
+- `end_date` - End date (YYYY-MM-DD)
+
+**Response:**
+```json
+{
+  "success": true,
+  "period": { "start_date": "...", "end_date": "..." },
+  "publishers": [
+    {
+      "publisherId": "uuid",
+      "publisherName": "example.com",
+      "totalTraffic": 50000,
+      "validTraffic": 48500,
+      "invalidTrafficRate": 3.0,
+      "givtRate": 2.0,
+      "sivtRate": 1.0
+    }
+  ]
+}
+```
+
+### GET `/api/v1/reports/ivt/campaigns`
+
+Get IVT report by campaign.
+
+**Authentication:** Required
+
+**Query Parameters:**
+- `start_date` - Start date (YYYY-MM-DD)
+- `end_date` - End date (YYYY-MM-DD)
+
+**Response:**
+```json
+{
+  "success": true,
+  "period": { "start_date": "...", "end_date": "..." },
+  "campaigns": [
+    {
+      "campaignId": "uuid",
+      "campaignName": "Campaign Name",
+      "totalTraffic": 30000,
+      "validTraffic": 29100,
+      "invalidTrafficRate": 3.0,
+      "givtRate": 2.0,
+      "sivtRate": 1.0
+    }
+  ]
+}
+```
+
+### GET `/api/v1/reports/ivt/stats`
+
+Get aggregate IVT statistics.
+
+**Authentication:** Required
+
+**Query Parameters:**
+- `start_date` - Start date (YYYY-MM-DD)
+- `end_date` - End date (YYYY-MM-DD)
+
+**Response:**
+```json
+{
+  "success": true,
+  "period": { "start_date": "...", "end_date": "..." },
+  "stats": {
+    "averageInvalidTrafficRate": 3.2,
+    "averageGIVTRate": 2.1,
+    "averageSIVTRate": 1.1,
+    "totalTraffic": 1000000,
+    "totalInvalidTraffic": 32000
+  }
+}
+```
+
+---
+
+## Enhanced Click Tracking
+
+### Updated Click URL Format
+
+Click URLs now include Google Transparent Click Tracker compliance with visible `url` parameter:
+
+```
+GET /track/click/:impressionId?campaign_id=xxx&publisher_id=yyy&slot_id=zzz&url=https://advertiser.com/page
+```
+
+**Query Parameters:**
+- `campaign_id` - Campaign UUID (required)
+- `publisher_id` - Publisher UUID (required)
+- `slot_id` - Ad slot ID (required)
+- `geo` - Country code (optional)
+- `device` - Device type (optional)
+- `url` - Landing page URL (Google Transparent Click Tracker requirement)
+
+**Features:**
+- Time-based fraud detection (<1s clicks marked suspicious)
+- Impression-click validation (verifies preceding impression)
+- Combined fraud status (time-based + Pixalate)
+- Automatic redirect to landing page
+
+---
+
+## Configuration
+
+### Tracking Configuration
+
+Default configuration values (can be overridden via environment variables):
+
+**Attribution Windows:**
+- Default: 30 days
+- Short: 7 days
+- Long: 30 days
+- Maximum: 90 days
+
+**Fraud Thresholds:**
+- Clean: < 0.5
+- Suspicious: 0.5 - 0.7
+- Fraud: ≥ 0.7
+- Block: ≥ 0.9
+
+**Privacy Modes:**
+- Standard: Full tracking with consent
+- Privacy-Enhanced: Hashed IPs, truncated UAs
+- Minimal: No PII tracking
+
+**IVT Detection:**
+- GIVT: Enabled
+- SIVT: Enabled
+- Impression Sampling: 15%
+- Click Sampling: 100%
+
+---
+
+**Last Updated**: 2024-11-13
+
+
+
 

@@ -13,6 +13,8 @@
 ✅ **Security middleware functioning as expected**  
 ⚠️ **Data-dependent endpoints require database setup**
 
+**Note**: This is a consolidated test report combining endpoint tests and end-to-end flow verification. See `CORE_FLOW_TEST_RESULTS.md` for detailed user journey testing.
+
 ---
 
 ## Test Results by Category

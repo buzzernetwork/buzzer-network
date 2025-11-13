@@ -102,6 +102,11 @@ Your database is now connected and ready to use!
 - Check Supabase project is fully provisioned
 - Verify user has CREATE privileges
 
+### Railway Deployment Issues
+- **Note**: If deploying to Railway, use Supabase **Connection Pooler** instead of direct connection
+- **Pooler URL**: Get from Supabase Dashboard → Settings → Database → Connection pooling → Transaction mode
+- **Why**: Railway may have IPv6 connectivity issues with Supabase direct connections
+
 ---
 
 ## 📊 What's Created

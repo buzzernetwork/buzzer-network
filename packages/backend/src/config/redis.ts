@@ -80,5 +80,52 @@ export const cache = {
       return false;
     }
   },
+
+  async incr(key: string): Promise<number> {
+    try {
+      return await redis.incr(key);
+    } catch (error) {
+      console.error('Redis incr error:', error);
+      return 0;
+    }
+  },
+
+  async decr(key: string): Promise<number> {
+    try {
+      return await redis.decr(key);
+    } catch (error) {
+      console.error('Redis decr error:', error);
+      return 0;
+    }
+  },
+
+  async expire(key: string, seconds: number): Promise<boolean> {
+    try {
+      const result = await redis.expire(key, seconds);
+      return result === 1;
+    } catch (error) {
+      console.error('Redis expire error:', error);
+      return false;
+    }
+  },
+
+  async getVersion(key: string): Promise<number> {
+    try {
+      const value = await redis.get(key);
+      return value ? parseInt(value, 10) : 0;
+    } catch (error) {
+      console.error('Redis getVersion error:', error);
+      return 0;
+    }
+  },
+
+  async incrVersion(key: string): Promise<number> {
+    try {
+      return await redis.incr(key);
+    } catch (error) {
+      console.error('Redis incrVersion error:', error);
+      return 0;
+    }
+  },
 };
 

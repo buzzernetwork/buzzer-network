@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import Image from "next/image";
 
 interface Meme {
   id: string;
@@ -10,26 +10,77 @@ interface Meme {
   category?: string;
   imageUrl: string;
   sourceUrl?: string;
+  isPublic?: boolean; // If true, imageUrl is a public path
 }
+
+// Pinterest images from public folder
+const pinterestMemes: Meme[] = [
+  {
+    id: "pinterest-2",
+    title: "Ad Creative Design",
+    category: "advertising",
+    imageUrl: "/memes/39dd3e9e61b850b619d37837eb6f76f6.jpg",
+    isPublic: true,
+  },
+  {
+    id: "pinterest-3",
+    title: "Marketing Creative",
+    category: "advertising",
+    imageUrl: "/memes/d458558f34e6d1cc04587a8190a635cf.jpg",
+    isPublic: true,
+  },
+  {
+    id: "pinterest-4",
+    title: "Brand Advertisement",
+    category: "advertising",
+    imageUrl: "/memes/f05b3989614fa591313f7e4a83ea111e.jpg",
+    isPublic: true,
+  },
+  {
+    id: "pinterest-5",
+    title: "Creative Marketing",
+    category: "advertising",
+    imageUrl: "/memes/5f42d1530f48dba92e8fbafbcc92626c.jpg",
+    isPublic: true,
+  },
+  {
+    id: "pinterest-6",
+    title: "Ad Design Inspiration",
+    category: "advertising",
+    imageUrl: "/memes/baf035ab84a13b53bf6e46662fb4b610.jpg",
+    isPublic: true,
+  },
+  {
+    id: "pinterest-7",
+    title: "Creative Advertisement",
+    category: "advertising",
+    imageUrl: "/memes/4d9035ee7bb30f8c274a3fa171504481.jpg",
+    isPublic: true,
+  },
+  {
+    id: "pinterest-8",
+    title: "Marketing Ad Creative",
+    category: "advertising",
+    imageUrl: "/memes/4c0c4c133ce344d98dcf5b87566416d2.jpg",
+    isPublic: true,
+  },
+  {
+    id: "pinterest-9",
+    title: "Brand Creative",
+    category: "advertising",
+    imageUrl: "/memes/869188e28c63c5fd27816744bf84d2c4.jpg",
+    isPublic: true,
+  },
+];
 
 export function MemeGallery() {
   const [memes, setMemes] = useState<Meme[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadMemes() {
-      try {
-        const result = await api.getMemeGallery();
-        if (result.success && result.memes) {
-          setMemes(result.memes);
-        }
-      } catch (error) {
-        console.error("Failed to load memes:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadMemes();
+    // Use only static Pinterest memes (no API calls)
+    setMemes(pinterestMemes);
+    setLoading(false);
   }, []);
 
   if (loading) {
@@ -67,14 +118,24 @@ export function MemeGallery() {
             >
               <div className="relative aspect-video bg-white/5 overflow-hidden">
                 {meme.imageUrl ? (
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${meme.imageUrl}`}
-                    alt={meme.title || meme.description || "Ad creative"}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
+                  meme.isPublic || meme.imageUrl.startsWith("/memes/") ? (
+                    <Image
+                      src={meme.imageUrl}
+                      alt={meme.title || meme.description || "Ad creative"}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                  ) : (
+                    <img
+                      src={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}${meme.imageUrl}`}
+                      alt={meme.title || meme.description || "Ad creative"}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  )
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-white/40">
                     No image

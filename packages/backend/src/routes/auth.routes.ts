@@ -126,7 +126,7 @@ router.get('/me', async (req, res) => {
 
     // Get user info
     const publisherResult = await dbPool.query(
-      'SELECT id, wallet_address, website_url, status FROM publishers WHERE wallet_address = $1',
+      'SELECT id, wallet_address, status FROM publishers WHERE wallet_address = $1',
       [decoded.walletAddress]
     );
 
@@ -169,4 +169,7 @@ router.get('/me', async (req, res) => {
 });
 
 export default router;
+
+
+
 

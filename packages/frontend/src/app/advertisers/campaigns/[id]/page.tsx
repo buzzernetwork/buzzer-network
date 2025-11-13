@@ -104,7 +104,7 @@ export default function CampaignDetailPage() {
     : 0;
 
   return (
-    <div className="min-h-screen py-8 bg-frosted-dark">
+    <div className="min-h-screen py-8 bg-frosted-dark pt-24">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -114,7 +114,7 @@ export default function CampaignDetailPage() {
             >
               ← Back to Campaigns
             </Link>
-            <h1 className="text-3xl font-bold text-white">{campaign.name}</h1>
+            <h1 className="text-3xl font-bold text-white scroll-mt-24">{campaign.name}</h1>
           </div>
           <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
             campaign.status === 'active' ? 'bg-green-500/20 text-green-200 border border-green-500/30' :
@@ -187,7 +187,7 @@ export default function CampaignDetailPage() {
                 <div>
                   <p className="text-sm text-white/60">Bid Amount</p>
                   <p className="font-medium text-white">{parseFloat(campaign.bid_amount || '0').toFixed(6)} ETH</p>
-                  <p className="text-xs text-white/40">
+                  <p className="text-xs text-white/60">
                     {campaign.bid_model === 'CPM' ? 'per 1,000 impressions' : 'per click'}
                   </p>
                 </div>

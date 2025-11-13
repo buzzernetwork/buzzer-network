@@ -59,11 +59,11 @@ export default function CampaignsPage() {
 
   return (
     <div
-      className="min-h-screen py-8 bg-frosted-dark"
+      className="min-h-screen py-8 bg-frosted-dark pt-24"
     >
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Campaigns</h1>
+          <h1 className="text-3xl font-bold text-white scroll-mt-24">Campaigns</h1>
           <Button
             asChild
             variant="glass-dark"

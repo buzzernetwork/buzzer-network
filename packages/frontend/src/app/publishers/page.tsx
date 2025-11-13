@@ -17,7 +17,9 @@ export default function PublishersPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [checkingAccount, setCheckingAccount] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
@@ -30,6 +32,62 @@ export default function PublishersPage() {
     payment_wallet?: string;
   }>({});
   const [prefetchingToken, setPrefetchingToken] = useState(false);
+
+  // Fix hydration mismatch - only render form after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Check if user already has a publisher account and redirect to dashboard
+  useEffect(() => {
+    async function checkExistingPublisher() {
+      if (!isConnected || !address || !mounted) {
+        return;
+      }
+
+      setCheckingAccount(true);
+      
+      try {
+        // Try to get auth token
+        let token = getAuthToken();
+        
+        // If no token, try to authenticate silently
+        if (!token) {
+          try {
+            await authenticateWithWallet(address, signMessageAsync as any);
+            token = getAuthToken();
+          } catch {
+            // Authentication failed, user needs to connect/sign
+            setCheckingAccount(false);
+            return;
+          }
+        }
+
+        if (!token) {
+          setCheckingAccount(false);
+          return;
+        }
+
+        // Check if publisher account exists
+        const publisherResult = await api.getPublisher(token);
+        
+        if (publisherResult.publisher?.id) {
+          // Publisher account exists - redirect to dashboard
+          console.log('Publisher account exists, redirecting to dashboard...');
+          router.push('/publishers/dashboard');
+          // Keep checkingAccount true to prevent form flash
+          return;
+        }
+      } catch (error) {
+        // Publisher doesn't exist - that's fine, show registration form
+        console.log('No existing publisher account found');
+      }
+      
+      setCheckingAccount(false);
+    }
+
+    checkExistingPublisher();
+  }, [isConnected, address, mounted, router, signMessageAsync]);
 
   // Validate URL format
   const validateURL = (url: string): boolean => {
@@ -121,18 +179,28 @@ export default function PublishersPage() {
         const publisherResult = await api.getPublisher(authToken);
 
         if (publisherResult.publisher?.id) {
-          // Publisher exists, prefetch verification token
-          const tokenResult = await api.getVerificationToken(
-            publisherResult.publisher.id,
-            authToken
-          );
+          // Publisher exists, check if they have domains
+          const domains = publisherResult.publisher.domains || [];
+          if (domains.length > 0) {
+            // Prefetch token for the first domain (or most recent)
+            const domain = domains[domains.length - 1];
+            try {
+              const tokenResult = await api.getDomainVerificationToken(
+                publisherResult.publisher.id,
+                domain.id,
+                authToken
+              );
 
-          // Cache it in sessionStorage
-          if (typeof window !== "undefined") {
-            sessionStorage.setItem(
-              `verification_token_${publisherResult.publisher.id}`,
-              tokenResult.verification_token
-            );
+              // Cache it with domain-specific key
+              if (typeof window !== "undefined") {
+                sessionStorage.setItem(
+                  `verification_token_${publisherResult.publisher.id}_${domain.id}`,
+                  tokenResult.verification_token
+                );
+              }
+            } catch (err) {
+              // Silently fail
+            }
           }
         }
       } catch (error) {
@@ -211,26 +279,31 @@ export default function PublishersPage() {
       setSuccess(true);
       console.log("Publisher registered:", result);
 
-      // Pre-fetch verification token immediately (don't wait for it)
-      // This way it's ready when user lands on verification page
-      api
-        .getVerificationToken(result.publisher.id, token)
-        .then((tokenResult) => {
-          // Cache it in sessionStorage for immediate use on verification page
-          if (typeof window !== "undefined") {
-            sessionStorage.setItem(
-              `verification_token_${result.publisher.id}`,
-              tokenResult.verification_token
+      // Get the newly added domain (last one in the array)
+      const domains = result.publisher.domains || [];
+      const newDomain = domains[domains.length - 1];
+
+      if (newDomain) {
+        // Pre-fetch verification token for the new domain
+        api
+          .getDomainVerificationToken(result.publisher.id, newDomain.id, token)
+          .then((tokenResult) => {
+            // Cache it with domain-specific key
+            if (typeof window !== "undefined") {
+              sessionStorage.setItem(
+                `verification_token_${result.publisher.id}_${newDomain.id}`,
+                tokenResult.verification_token
+              );
+            }
+          })
+          .catch((err) => {
+            // Silently fail - we'll fetch it again on verification page if needed
+            console.log(
+              "Pre-fetch token failed (will retry on verification page):",
+              err
             );
-          }
-        })
-        .catch((err) => {
-          // Silently fail - we'll fetch it again on verification page if needed
-          console.log(
-            "Pre-fetch token failed (will retry on verification page):",
-            err
-          );
-        });
+          });
+      }
 
       // Auto-redirect to verification page immediately (no delay)
       router.push("/publishers/verify");
@@ -238,50 +311,24 @@ export default function PublishersPage() {
       const errorMessage =
         err instanceof Error ? err.message : "Registration failed";
 
-      // Handle duplicate registration gracefully - redirect immediately
+      // Handle existing publisher - domain will be added automatically
+      // The backend now handles this, so if we get here with a 409, it means domain already exists
       if (
         errorMessage.includes("already exists") ||
         errorMessage.includes("409")
       ) {
-        // Get token for prefetching
-        const authToken = getAuthToken();
-
-        // Try to get publisher info and prefetch token if not already cached
-        // Do this in background, don't wait for it
-        if (authToken) {
-          (async () => {
-            try {
-              const publisherResult = await api.getPublisher(authToken);
-              if (publisherResult.publisher?.id) {
-                // Check if token is already cached
-                const cachedToken = sessionStorage.getItem(
-                  `verification_token_${publisherResult.publisher.id}`
-                );
-
-                if (!cachedToken) {
-                  // Prefetch token (in background, don't block redirect)
-                  const tokenResult = await api.getVerificationToken(
-                    publisherResult.publisher.id,
-                    authToken
-                  );
-                  sessionStorage.setItem(
-                    `verification_token_${publisherResult.publisher.id}`,
-                    tokenResult.verification_token
-                  );
-                }
-              }
-            } catch (prefetchError) {
-              // If prefetch fails, still redirect - verification page will fetch it
-              console.log(
-                "Prefetch failed, will fetch on verification page:",
-                prefetchError
-              );
-            }
-          })();
+        // Check if it's a domain conflict
+        if (errorMessage.includes("Domain already exists")) {
+          // Domain already registered - just take them to dashboard
+          console.log("Domain already registered, redirecting to dashboard");
+          router.push("/publishers/dashboard");
+          return;
         }
-
-        // Redirect immediately (no delay, no error message)
-        router.push("/publishers/verify");
+        
+        // If publisher exists, the backend should have added the domain
+        // But if we get here, something went wrong - show error
+        setError("Domain could not be added. Please try again.");
+        setLoading(false);
         return;
       }
 
@@ -389,16 +436,25 @@ export default function PublishersPage() {
             </section>
           </div>
 
-          {!isConnected && (
+          {!mounted ? (
+            // Show loading state during hydration to prevent mismatch
+            <div className="mb-8">
+              <div className="h-14 bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl animate-pulse"></div>
+            </div>
+          ) : !isConnected ? (
             <div className="mb-8">
               <p className="text-white/80 mb-4">
                 Connect your wallet to get started:
               </p>
               <WalletConnect />
             </div>
-          )}
-
-          {isConnected && (
+          ) : checkingAccount ? (
+            // Show loading while checking for existing publisher account
+            <div className="mb-8 flex flex-col items-center justify-center py-12 space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+              <p className="text-white/60">Checking your account...</p>
+            </div>
+          ) : (
             <form
               onSubmit={handleSubmit}
               className="space-y-6 max-w-2xl mx-auto"

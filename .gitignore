@@ -61,3 +61,26 @@ base/
 *.pem
 *.key
 
+# Turbo build cache
+.turbo/
+turbo-build.log
+
+# Build artifacts
+dist/
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.template
+
+.vercel
+

@@ -1,0 +1,27 @@
+# Prometheus Configuration for Buzzer Network
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'buzzer-network'
+
+# Scrape configurations
+scrape_configs:
+  # Buzzer Network Backend
+  - job_name: 'buzzer-network-backend'
+    static_configs:
+      - targets: ['localhost:3001']
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+# Alerting (optional - configure Alertmanager if needed)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['localhost:9093']
+
+# Rule files (optional - add alerting rules)
+# rule_files:
+#   - 'alerts.yml'
+

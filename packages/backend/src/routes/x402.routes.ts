@@ -4,8 +4,16 @@
  */
 
 import { Router } from 'express';
+import { randomUUID } from 'crypto';
 import { x402Middleware } from '../middleware/x402.middleware.js';
 import { matchCampaigns } from '../services/matching.service.js';
+import { dbPool } from '../config/database.js';
+import { adServingRateLimiter } from '../middleware/rate-limiter.middleware.js';
+import { adLogger } from '../config/logger.js';
+import { adServeCounter, campaignMatchDuration } from '../middleware/metrics.middleware.js';
+import { extractClientIP, getGeoFromIP } from '../services/geo-ip.service.js';
+import { checkFrequencyCap } from '../services/frequency-cap.service.js';
+import { trackAdRequest } from '../services/ad-request-tracking.service.js';
 
 const router = Router();
 
@@ -40,12 +48,24 @@ const router = Router();
  *   "x402_payment_url": "https://..."
  * }
  */
-router.get('/x402/ad', x402Middleware, async (req, res) => {
+router.get('/x402/ad', adServingRateLimiter, x402Middleware, async (req, res) => {
   try {
     const { pub_id, slot_id, format, geo, device } = req.query;
     
     // Validate required parameters
     if (!pub_id || !slot_id || !format) {
+      // Track unfilled request
+      if (pub_id && slot_id && format) {
+        trackAdRequest({
+          publisherId: pub_id as string,
+          slotId: slot_id as string,
+          format: format as string,
+          geo: geo as string,
+          device: device as string,
+          filled: false,
+          reason: 'error',
+        }).catch(err => console.error('Failed to track ad request:', err));
+      }
       return res.status(400).json({
         error: 'Missing required parameters',
         required: ['pub_id', 'slot_id', 'format'],
@@ -56,6 +76,16 @@ router.get('/x402/ad', x402Middleware, async (req, res) => {
     // Validate format
     const validFormats = ['banner', 'native', 'video'];
     if (!validFormats.includes(format as string)) {
+      // Track unfilled request
+      trackAdRequest({
+        publisherId: pub_id as string,
+        slotId: slot_id as string,
+        format: format as string,
+        geo: geo as string,
+        device: device as string,
+        filled: false,
+        reason: 'error',
+      }).catch(err => console.error('Failed to track ad request:', err));
       return res.status(400).json({
         error: 'Invalid format',
         valid_formats: validFormats,
@@ -63,38 +93,174 @@ router.get('/x402/ad', x402Middleware, async (req, res) => {
       });
     }
     
-    // Match campaigns using matching engine
-    const matchedCampaigns = await matchCampaigns({
+    // NEW: Validate slot exists and is active
+    const slotResult = await dbPool.query(
+      'SELECT * FROM ad_slots WHERE slot_id = $1 AND publisher_id = $2 AND status = $3',
+      [slot_id, pub_id, 'active']
+    );
+    
+    if (slotResult.rows.length === 0) {
+      // Track unfilled request
+      trackAdRequest({
+        publisherId: pub_id as string,
+        slotId: slot_id as string,
+        format: format as string,
+        geo: geo as string,
+        device: device as string,
+        filled: false,
+        reason: 'error',
+      }).catch(err => console.error('Failed to track ad request:', err));
+      return res.status(404).json({ 
+        error: 'Slot not found or inactive',
+        message: 'The requested ad slot does not exist or is not active'
+      });
+    }
+    
+    const slot = slotResult.rows[0];
+    
+    // NEW: Verify publisher has verified domain
+    const publisherResult = await dbPool.query(
+      `SELECT EXISTS(
+        SELECT 1 FROM publisher_domains 
+        WHERE publisher_id = $1 AND domain_verified = true
+      ) as has_verified`,
+      [pub_id]
+    );
+    
+    if (!publisherResult.rows[0].has_verified) {
+      // Track unfilled request
+      trackAdRequest({
+        publisherId: pub_id as string,
+        slotId: slot_id as string,
+        format: format as string,
+        geo: geo as string,
+        device: device as string,
+        filled: false,
+        reason: 'blocked',
+      }).catch(err => console.error('Failed to track ad request:', err));
+      return res.status(403).json({ 
+        error: 'Publisher domain not verified',
+        message: 'At least one domain must be verified before serving ads'
+      });
+    }
+    
+    // Auto-detect geo if not provided
+    let geoParam = geo as string;
+    if (!geoParam) {
+      const clientIP = extractClientIP(req);
+      const geoData = await getGeoFromIP(clientIP);
+      geoParam = geoData.country || '';
+      
+      if (geoParam) {
+        adLogger.debug('Auto-detected geo from IP', { 
+          publisher_id: pub_id,
+          ip: clientIP, 
+          country: geoParam 
+        });
+      }
+    }
+    
+    // Match campaigns using matching engine (request top 3 for A/B testing)
+    // Matching service already handles floor price and size filtering
+    let matchedCampaigns = await matchCampaigns({
       publisherId: pub_id as string,
       slotId: slot_id as string,
       format: format as string,
-      geo: geo as string,
+      geo: geoParam,
       device: device as string,
-    });
+    }, 3);
+    
+    // Filter by frequency cap (3 impressions per day per user)
+    const freqFilteredCampaigns = [];
+    for (const campaign of matchedCampaigns) {
+      const allowed = await checkFrequencyCap(req, campaign.id, 3);
+      if (allowed) {
+        freqFilteredCampaigns.push(campaign);
+      }
+    }
+    matchedCampaigns = freqFilteredCampaigns;
     
     if (matchedCampaigns.length === 0) {
+      // Track unfilled request
+      trackAdRequest({
+        publisherId: pub_id as string,
+        slotId: slot_id as string,
+        format: format as string,
+        geo: geoParam,
+        device: device as string,
+        filled: false,
+        reason: 'no_match',
+      }).catch(err => console.error('Failed to track ad request:', err));
       return res.status(404).json({
         error: 'No matching campaigns',
         message: 'No active campaigns match your criteria',
       });
     }
     
-    const selectedCampaign = matchedCampaigns[0];
-    const adId = `AD_${selectedCampaign.id.slice(0, 8).toUpperCase()}`;
     const apiUrl = process.env.API_URL || 'http://localhost:3001';
     
-    // Return X402-compliant response
+    // Return multiple campaigns for client-side A/B testing
+    // Generate unique impression ID for each ad (IAB standard)
+    const ads = matchedCampaigns.map(campaign => {
+      const impressionId = randomUUID(); // Unique per impression
+      const creativeDimensions = campaign.creative_dimensions || slot.primary_size || '300x250';
+      const [width, height] = creativeDimensions.split('x').map(Number);
+      
+      // Google Transparent Click Tracker requirement: visible url parameter showing next hop
+      const landingPageUrl = campaign.landing_page_url || '';
+      const clickUrl = `${apiUrl}/track/click/${impressionId}?campaign_id=${campaign.id}&publisher_id=${pub_id}&slot_id=${slot_id}&url=${encodeURIComponent(landingPageUrl)}`;
+      
+      return {
+        impression_id: impressionId, // Unique identifier for this specific impression
+        campaign_id: campaign.id,
+        creative_url: campaign.creative_url,
+        format: campaign.creative_format,
+        width: width || 300,
+        height: height || 250,
+        bid_amount: parseFloat(campaign.bid_amount), // For weighted selection
+        click_url: clickUrl,
+        impression_url: `${apiUrl}/track/impression/${impressionId}`,
+      };
+    });
+    
+    // Track successful ad request (filled)
+    trackAdRequest({
+      publisherId: pub_id as string,
+      slotId: slot_id as string,
+      format: format as string,
+      geo: geoParam,
+      device: device as string,
+      filled: true,
+      campaignId: matchedCampaigns[0].id, // Top campaign
+    }).catch(err => console.error('Failed to track ad request:', err));
+    
+    // Log successful ad serve
+    adServeCounter.labels(pub_id as string, 'success', format as string).inc();
+    adLogger.info('Ads served successfully', {
+      publisher_id: pub_id,
+      slot_id,
+      num_ads: ads.length,
+      campaign_ids: matchedCampaigns.map(c => c.id),
+      format,
+      top_bid: matchedCampaigns[0].bid_amount,
+    });
+    
+    // Return X402-compliant response with multiple ads
     res.status(200).json({
-      ad_id: adId,
-      creative_url: selectedCampaign.creative_url,
-      format: selectedCampaign.creative_format,
-      width: 300, // TODO: Extract from dimensions
-      height: 250,
-      click_url: `${apiUrl}/track/click/${adId}`,
-      impression_url: `${apiUrl}/track/impression/${adId}`,
+      ads, // Array of ad options
+      selection_strategy: 'weighted', // Client can use bid_amount for weighted random selection
+      recommended_ad: ads[0], // Highest bidder as default recommendation
     });
   } catch (error) {
-    console.error('X402 Ad Endpoint Error:', error);
+    const { pub_id, slot_id, format } = req.query;
+    adLogger.error('X402 Ad Endpoint Error', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      pub_id: pub_id as string,
+      slot_id: slot_id as string,
+      format: format as string,
+    });
+    adServeCounter.labels((pub_id as string) || 'unknown', 'error', (format as string) || 'unknown').inc();
     res.status(500).json({
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error',

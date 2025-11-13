@@ -174,10 +174,18 @@ The Redis config is in `packages/backend/src/config/redis.ts` and supports:
 
 **The system works without Redis**, but performance will be better with it.
 
+### Decision Summary
+- **MVP/Development**: Redis is optional - system works fine without it (just slower ad serving)
+- **Production**: Redis recommended for performance, idempotency, and scalability
+- **Current Implementation**: Gracefully handles Redis unavailability (falls back to database queries)
+
 ---
 
 **Next Steps:**
 1. For quick start: Skip Redis for now (works without it)
 2. For production: Set up Upstash (5 minutes)
 3. For development: Use local Redis (optional)
+
+
+
 

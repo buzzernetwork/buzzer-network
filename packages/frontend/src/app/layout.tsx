@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Instrument_Serif, JetBrains_Mono } from 'next/font/google';
 import { Providers } from './providers';
 import { Header } from '@/components/Header';
 import './globals.css';
@@ -9,9 +9,31 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
+const instrumentSerif = Instrument_Serif({
+  variable: '--font-instrument',
+  subsets: ['latin'],
+  weight: '400',
+  style: ['italic', 'normal'],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
+
 export const metadata: Metadata = {
-  title: 'Buzzer Network - X402 Ad Network',
-  description: 'Decentralized ad network on BASE blockchain',
+  title: 'Buzzer Network',
+  description: 'Connect directly with publishers. Transparent payments. No middlemen.',
+  openGraph: {
+    title: 'Buzzer Network',
+    description: 'Connect directly with publishers. Transparent payments. No middlemen.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Buzzer Network',
+    description: 'Connect directly with publishers. Transparent payments. No middlemen.',
+  },
 };
 
 export default function RootLayout({
@@ -21,10 +43,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <Providers>
           <Header />
-          {children}
+          <main id="main-content" className="animate-in fade-in duration-300">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

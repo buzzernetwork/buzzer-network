@@ -1,6 +1,8 @@
 PRODUCT REQUIREMENTS DOCUMENT v2 - BUZZER NETWORK
 ==================================================
 
+**Note**: This is the current and refined PRD. For historical reference, see `r03_prd_v1.txt`.
+
 REFINED & PRECISE REQUIREMENTS (Based on Iterations)
 
 1. EXECUTIVE SUMMARY

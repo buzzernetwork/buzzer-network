@@ -324,6 +324,17 @@ The migrations automatically detect if TimescaleDB is available and create hyper
 - Tables created as regular PostgreSQL
 - Analytics queries may be slower
 
+### Railway IPv6 Connection Issues
+- **Issue**: Railway may have IPv6 connectivity issues with Supabase direct connections
+- **Solution**: Use Supabase **Connection Pooler** (Transaction mode) instead of direct connection
+- **Pooler URL**: Get from Supabase Dashboard → Settings → Database → Connection pooling → Transaction mode
+- **Format**: `postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres`
+
+### Supabase RLS Warnings
+- **Note**: Supabase may show security warnings about Row Level Security (RLS) - this is normal and safe
+- **Why**: We use direct PostgreSQL connections, not Supabase client SDK, so RLS warnings can be ignored
+- **When to enable**: Only if using Supabase client SDK directly from frontend
+
 ---
 
 ## 📝 Next Steps

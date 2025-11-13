@@ -1,6 +1,8 @@
 PRODUCT REQUIREMENTS DOCUMENT v1 - BUZZER NETWORK
 ==================================================
 
+**Note**: This is the initial PRD (v1). For the refined and current requirements, see `r04_prd_v2.txt`. This document is kept for historical reference.
+
 HIGH-LEVEL USER JOURNEY & REQUIREMENTS
 
 1. OVERVIEW
