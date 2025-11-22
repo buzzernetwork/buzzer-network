@@ -14,6 +14,7 @@ import { adServeCounter, campaignMatchDuration } from '../middleware/metrics.mid
 import { extractClientIP, getGeoFromIP } from '../services/geo-ip.service.js';
 import { checkFrequencyCap } from '../services/frequency-cap.service.js';
 import { trackAdRequest } from '../services/ad-request-tracking.service.js';
+import { shouldRouteToBuzzer, getDualRunningConfig, trackDualRunningMetrics } from '../services/dual-running.service.js';
 
 const router = Router();
 
@@ -160,6 +161,42 @@ router.get('/x402/ad', adServingRateLimiter, x402Middleware, async (req, res) =>
       }
     }
     
+    // NEW: Check traffic splitting (dual-running)
+    const dualRunningConfig = await getDualRunningConfig(slot_id as string);
+    if (dualRunningConfig && !shouldRouteToBuzzer(dualRunningConfig.buzzer_traffic_percent, slot_id as string)) {
+      // Route to fallback network
+      if (dualRunningConfig.fallback_enabled && dualRunningConfig.fallback_code) {
+        // Track fallback request
+        trackDualRunningMetrics(slot_id as string, 'fallback', {
+          impressions: 1,
+          fill_rate: 1.0,
+        }).catch(err => console.error('Failed to track fallback metrics:', err));
+        
+        return res.status(200).json({
+          route_to_fallback: true,
+          fallback_network: dualRunningConfig.fallback_network,
+          fallback_code: dualRunningConfig.fallback_code,
+          message: 'Traffic routed to fallback network per dual-running configuration',
+        });
+      } else {
+        // No fallback configured - return no fill
+        trackAdRequest({
+          publisherId: pub_id as string,
+          slotId: slot_id as string,
+          format: format as string,
+          geo: geoParam,
+          device: device as string,
+          filled: false,
+          reason: 'no_match',
+        }).catch(err => console.error('Failed to track ad request:', err));
+        
+        return res.status(404).json({
+          error: 'No ad available',
+          message: 'Traffic split configured but no fallback network enabled',
+        });
+      }
+    }
+    
     // Match campaigns using matching engine (request top 3 for A/B testing)
     // Matching service already handles floor price and size filtering
     let matchedCampaigns = await matchCampaigns({
@@ -181,6 +218,32 @@ router.get('/x402/ad', adServingRateLimiter, x402Middleware, async (req, res) =>
     matchedCampaigns = freqFilteredCampaigns;
     
     if (matchedCampaigns.length === 0) {
+      // Check if fallback should be used
+      if (dualRunningConfig?.fallback_enabled && dualRunningConfig.fallback_code) {
+        // Track fallback request (no fill from Buzzer)
+        trackDualRunningMetrics(slot_id as string, 'fallback', {
+          impressions: 1,
+          fill_rate: 1.0,
+        }).catch(err => console.error('Failed to track fallback metrics:', err));
+        
+        trackAdRequest({
+          publisherId: pub_id as string,
+          slotId: slot_id as string,
+          format: format as string,
+          geo: geoParam,
+          device: device as string,
+          filled: false,
+          reason: 'no_match',
+        }).catch(err => console.error('Failed to track ad request:', err));
+        
+        return res.status(200).json({
+          route_to_fallback: true,
+          fallback_network: dualRunningConfig.fallback_network,
+          fallback_code: dualRunningConfig.fallback_code,
+          message: 'No Buzzer campaigns available, routing to fallback network',
+        });
+      }
+      
       // Track unfilled request
       trackAdRequest({
         publisherId: pub_id as string,
@@ -233,6 +296,18 @@ router.get('/x402/ad', adServingRateLimiter, x402Middleware, async (req, res) =>
       filled: true,
       campaignId: matchedCampaigns[0].id, // Top campaign
     }).catch(err => console.error('Failed to track ad request:', err));
+    
+    // Track dual-running metrics for Buzzer
+    if (dualRunningConfig) {
+      const topBid = parseFloat(matchedCampaigns[0].bid_amount);
+      const ecpm = matchedCampaigns[0].bid_model === 'CPM' ? topBid : topBid * 0.02 * 1000; // Estimate for CPC
+      
+      trackDualRunningMetrics(slot_id as string, 'buzzer', {
+        impressions: 1,
+        fill_rate: 1.0,
+        ecpm: ecpm,
+      }).catch(err => console.error('Failed to track dual-running metrics:', err));
+    }
     
     // Log successful ad serve
     adServeCounter.labels(pub_id as string, 'success', format as string).inc();

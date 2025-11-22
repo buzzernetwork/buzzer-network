@@ -185,6 +185,33 @@ export const api = {
     });
   },
 
+  async getSettlements(publisherId: string, token: string, limit?: number) {
+    const params = new URLSearchParams();
+    if (limit) params.append('limit', limit.toString());
+    
+    return fetchAPI(`/api/v1/publishers/${publisherId}/settlements?${params}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async getPublisherViewability(publisherId: string, days: number, token: string) {
+    return fetchAPI(`/api/v1/metrics/viewability/publisher/${publisherId}?days=${days}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async getPublisherFillRate(publisherId: string, days: number, token: string) {
+    return fetchAPI(`/api/v1/metrics/fill-rate/publisher/${publisherId}?days=${days}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
   // Advertisers
   async registerAdvertiser(data: {
     company_name: string;
@@ -232,6 +259,59 @@ export const api = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+    });
+  },
+
+  async uploadCreative(file: File, token: string, onProgress?: (progress: number) => void): Promise<{
+    success: boolean;
+    url: string;
+    key: string;
+    size: number;
+    contentType: string;
+  }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const xhr = new XMLHttpRequest();
+
+    return new Promise((resolve, reject) => {
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable && onProgress) {
+          const progress = (e.loaded / e.total) * 100;
+          onProgress(progress);
+        }
+      });
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            resolve(response);
+          } catch (error) {
+            reject(new Error('Invalid response from server'));
+          }
+        } else {
+          try {
+            const error = JSON.parse(xhr.responseText);
+            reject(new Error(error.error || error.message || 'Upload failed'));
+          } catch {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        }
+      });
+
+      xhr.addEventListener('error', () => {
+        reject(new Error('Network error during upload'));
+      });
+
+      xhr.addEventListener('abort', () => {
+        reject(new Error('Upload aborted'));
+      });
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      xhr.open('POST', `${apiUrl}/api/v1/advertisers/campaigns/creative/upload`);
+      xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      xhr.send(formData);
     });
   },
 
@@ -377,6 +457,112 @@ export const api = {
     }
 
     return response.text();
+  },
+
+  // Slot Import
+  async importSlots(publisherId: string, data: {
+    slots: Array<{
+      source_id?: string;
+      name: string;
+      format: 'banner' | 'native' | 'video';
+      sizes: string[];
+      primary_size: string;
+      position?: 'above_fold' | 'below_fold' | 'sidebar' | 'footer';
+      dimensions?: { width: number; height: number };
+      element_selector?: string;
+    }>;
+    source: 'gpt' | 'adsense' | 'dom-scan' | 'manual';
+    options?: {
+      auto_activate?: boolean;
+      preserve_ids?: boolean;
+      merge_duplicates?: boolean;
+    };
+  }, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/import`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async validateImportSlots(publisherId: string, data: {
+    slots: Array<{
+      source_id?: string;
+      name: string;
+      format: 'banner' | 'native' | 'video';
+      sizes: string[];
+      primary_size: string;
+      position?: 'above_fold' | 'below_fold' | 'sidebar' | 'footer';
+      dimensions?: { width: number; height: number };
+      element_selector?: string;
+    }>;
+    source: 'gpt' | 'adsense' | 'dom-scan' | 'manual';
+    options?: {
+      auto_activate?: boolean;
+      preserve_ids?: boolean;
+      merge_duplicates?: boolean;
+    };
+  }, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/import/validate`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getImportHistory(publisherId: string, token: string, limit?: number) {
+    const params = new URLSearchParams();
+    if (limit) params.append('limit', limit.toString());
+    
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/import/history?${params}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  // Dual-Running
+  async getDualRunningConfig(publisherId: string, slotId: string, token: string, days?: number) {
+    const params = new URLSearchParams();
+    if (days) params.append('days', days.toString());
+    
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/${slotId}/dual-running?${params}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
+
+  async updateDualRunningConfig(publisherId: string, slotId: string, data: {
+    buzzer_traffic_percent?: number;
+    fallback_network?: 'adsense' | 'gam' | 'custom';
+    fallback_code?: string;
+    fallback_enabled?: boolean;
+  }, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/${slotId}/dual-running`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async startGradualMigration(publisherId: string, slotId: string, data: {
+    target_traffic_percent: number;
+    duration_days: number;
+  }, token: string) {
+    return fetchAPI(`/api/v1/publishers/${publisherId}/slots/${slotId}/dual-running/migrate`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
   },
 };
 

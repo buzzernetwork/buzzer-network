@@ -3,14 +3,16 @@
  * Calculates and stores daily performance metrics for ad slots
  */
 
-import { dbPool } from '../config/database.js';
+import { dbPool, isDatabaseAvailable } from '../config/database.js';
+import { logger } from '../config/logger.js';
 
 /**
  * Aggregate metrics for a single slot for a specific date
  */
 export async function aggregateSlotMetrics(slotId: string, date: Date = new Date()): Promise<void> {
+  const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+  
   try {
-    const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
     
     // Calculate impressions count
     const impressionsResult = await dbPool.query(
@@ -95,10 +97,15 @@ export async function aggregateSlotMetrics(slotId: string, date: Date = new Date
       [slotId, dateStr, impressions, clicks, ctr, fill_rate, viewability_rate, ecpm, revenue]
     );
     
-    console.log(`✓ Aggregated metrics for slot ${slotId} on ${dateStr}`);
+    logger.debug(`Aggregated metrics for slot ${slotId} on ${dateStr}`);
   } catch (error) {
-    console.error(`Error aggregating metrics for slot ${slotId}:`, error);
-    throw error;
+    logger.error(`Error aggregating metrics for slot ${slotId}`, {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as any)?.code,
+      slotId,
+      date: dateStr,
+    });
+    // Don't throw - continue with other slots even if one fails
   }
 }
 
@@ -106,8 +113,15 @@ export async function aggregateSlotMetrics(slotId: string, date: Date = new Date
  * Aggregate metrics for all slots for a specific date
  */
 export async function aggregateAllSlotMetrics(date: Date = new Date()): Promise<void> {
+  // Check database availability before processing
+  const dbAvailable = await isDatabaseAvailable();
+  if (!dbAvailable) {
+    logger.warn('Database unavailable, skipping slot metrics aggregation');
+    return;
+  }
+
   try {
-    console.log(`🔄 Starting slot metrics aggregation for ${date.toISOString().split('T')[0]}...`);
+    logger.info(`Starting slot metrics aggregation for ${date.toISOString().split('T')[0]}`);
     
     // Get all unique slot IDs that had activity on this date
     const slotsResult = await dbPool.query(
@@ -122,42 +136,51 @@ export async function aggregateAllSlotMetrics(date: Date = new Date()): Promise<
     const slotIds = slotsResult.rows.map(row => row.slot_id);
     
     if (slotIds.length === 0) {
-      console.log('No active slots found for aggregation');
+      logger.debug('No active slots found for aggregation');
       return;
     }
     
-    console.log(`Found ${slotIds.length} active slots to aggregate`);
+    logger.info(`Found ${slotIds.length} active slots to aggregate`);
     
     // Aggregate metrics for each slot
     for (const slotId of slotIds) {
       await aggregateSlotMetrics(slotId, date);
     }
     
-    console.log(`✅ Completed slot metrics aggregation for ${slotIds.length} slots`);
+    logger.info(`Completed slot metrics aggregation for ${slotIds.length} slots`);
   } catch (error) {
-    console.error('Error in aggregateAllSlotMetrics:', error);
-    throw error;
+    logger.error('Error in aggregateAllSlotMetrics', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as any)?.code,
+      date: date.toISOString().split('T')[0],
+    });
+    // Don't throw - let worker continue even if one aggregation fails
   }
 }
+
+let lastErrorLogTime = 0;
+const ERROR_LOG_INTERVAL = 5 * 60 * 1000; // Log errors at most once per 5 minutes
 
 /**
  * Start hourly metrics aggregation worker
  */
 export function startSlotMetricsWorker(): void {
-  console.log('📊 Starting slot metrics aggregation worker...');
+  logger.info('Starting slot metrics aggregation worker...');
   
   // Run immediately for yesterday (in case we missed it)
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   aggregateAllSlotMetrics(yesterday).catch(err => {
-    console.error('Error in initial metrics aggregation:', err);
+    logger.error('Error in initial metrics aggregation', {
+      error: err instanceof Error ? err.message : 'Unknown error',
+    });
   });
   
   // Run every hour to aggregate the current day's metrics
   const HOURLY_INTERVAL = 60 * 60 * 1000; // 1 hour
   
   setInterval(async () => {
-    console.log('⏰ Running hourly slot metrics aggregation...');
+    logger.debug('Running hourly slot metrics aggregation');
     try {
       // Aggregate today's metrics
       await aggregateAllSlotMetrics(new Date());
@@ -167,13 +190,21 @@ export function startSlotMetricsWorker(): void {
       yesterday.setDate(yesterday.getDate() - 1);
       await aggregateAllSlotMetrics(yesterday);
       
-      console.log('✅ Hourly slot metrics aggregation complete');
+      logger.debug('Hourly slot metrics aggregation complete');
     } catch (error) {
-      console.error('❌ Hourly slot metrics aggregation failed:', error);
+      const now = Date.now();
+      // Only log error once per 5 minutes to reduce verbosity
+      if (now - lastErrorLogTime > ERROR_LOG_INTERVAL) {
+        logger.error('Hourly slot metrics aggregation failed', {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          code: (error as any)?.code,
+        });
+        lastErrorLogTime = now;
+      }
     }
   }, HOURLY_INTERVAL);
   
-  console.log('✓ Slot metrics worker started (runs every hour)');
+  logger.info('Slot metrics worker started (runs every hour)');
 }
 
 /**

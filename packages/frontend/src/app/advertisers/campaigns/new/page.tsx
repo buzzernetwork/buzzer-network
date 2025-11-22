@@ -10,13 +10,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert } from '@/components/ui/alert';
+import { CreativeUpload } from '@/components/CreativeUpload';
+import { useEthPrice } from '@/hooks/useEthPrice';
 
 export default function NewCampaignPage() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const router = useRouter();
+  const { ethPrice, convertToUSD, formatUSD } = useEthPrice();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Store USD amounts (user input)
+  const [usdAmounts, setUsdAmounts] = useState({
+    bid_amount_usd: '',
+    total_budget_usd: '',
+    daily_budget_usd: '',
+  });
   
   const [formData, setFormData] = useState({
     name: '',
@@ -35,6 +45,33 @@ export default function NewCampaignPage() {
     creative_format: 'banner' as 'banner' | 'native' | 'video',
     landing_page_url: '',
   });
+
+  // Convert USD to ETH
+  const usdToEth = (usdAmount: number): number => {
+    if (!ethPrice || ethPrice === 0) return 0;
+    return usdAmount / ethPrice;
+  };
+
+  // Convert ETH to USD
+  const ethToUsd = (ethAmount: number): number | null => {
+    return convertToUSD(ethAmount);
+  };
+
+  // Handle USD input changes and convert to ETH
+  const handleUsdChange = (field: 'bid_amount_usd' | 'total_budget_usd' | 'daily_budget_usd', value: string) => {
+    setUsdAmounts(prev => ({ ...prev, [field]: value }));
+    
+    const usdValue = parseFloat(value) || 0;
+    const ethValue = usdToEth(usdValue);
+    
+    if (field === 'bid_amount_usd') {
+      setFormData(prev => ({ ...prev, bid_amount: ethValue.toString() }));
+    } else if (field === 'total_budget_usd') {
+      setFormData(prev => ({ ...prev, total_budget: ethValue.toString() }));
+    } else if (field === 'daily_budget_usd') {
+      setFormData(prev => ({ ...prev, daily_budget: ethValue.toString() }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,54 +202,86 @@ export default function NewCampaignPage() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="total_budget" className="text-white/80 mb-2 block">
-                    Total Budget (ETH) *
+                  <Label htmlFor="total_budget_usd" className="text-white font-medium mb-3 block text-base">
+                    Total Budget (USD) <span className="text-white/60 font-normal" aria-label="required">*</span>
                   </Label>
-                  <Input
-                    id="total_budget"
-                    type="number"
-                    step="0.001"
-                    required
-                    variant="glass"
-                    value={formData.total_budget}
-                    onChange={(e) => setFormData({ ...formData, total_budget: e.target.value })}
-                    placeholder="1.0"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 font-medium z-10">$</span>
+                    <Input
+                      id="total_budget_usd"
+                      type="number"
+                      step="0.01"
+                      required
+                      variant="glass"
+                      value={usdAmounts.total_budget_usd}
+                      onChange={(e) => handleUsdChange('total_budget_usd', e.target.value)}
+                      className="pl-8 rounded-2xl"
+                      placeholder="100.00"
+                      inputMode="decimal"
+                    />
+                  </div>
+                  {usdAmounts.total_budget_usd && ethPrice && (
+                    <p className="mt-1.5 text-sm text-white/60">
+                      ≈ {parseFloat(formData.total_budget || '0').toFixed(6)} ETH
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="daily_budget" className="text-white/80 mb-2 block">
-                    Daily Budget (ETH)
+                  <Label htmlFor="daily_budget_usd" className="text-white font-medium mb-3 block text-base">
+                    Daily Budget (USD) <span className="text-white/60 font-normal">(Optional)</span>
                   </Label>
-                  <Input
-                    id="daily_budget"
-                    type="number"
-                    step="0.001"
-                    variant="glass"
-                    value={formData.daily_budget}
-                    onChange={(e) => setFormData({ ...formData, daily_budget: e.target.value })}
-                    placeholder="0.1"
-                  />
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 font-medium z-10">$</span>
+                    <Input
+                      id="daily_budget_usd"
+                      type="number"
+                      step="0.01"
+                      variant="glass"
+                      value={usdAmounts.daily_budget_usd}
+                      onChange={(e) => handleUsdChange('daily_budget_usd', e.target.value)}
+                      className="pl-8 rounded-2xl"
+                      placeholder="10.00"
+                      inputMode="decimal"
+                    />
+                  </div>
+                  {usdAmounts.daily_budget_usd && ethPrice && (
+                    <p className="mt-1.5 text-sm text-white/60">
+                      ≈ {parseFloat(formData.daily_budget || '0').toFixed(6)} ETH
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
-                <Label htmlFor="bid_amount" className="text-white/80 mb-2 block">
-                  Bid Amount (ETH) *
+                <Label htmlFor="bid_amount_usd" className="text-white font-medium mb-3 block text-base">
+                  Bid Amount (USD) <span className="text-white/60 font-normal" aria-label="required">*</span>
                 </Label>
-                <Input
-                  id="bid_amount"
-                  type="number"
-                  step="0.0001"
-                  required
-                  variant="glass"
-                  value={formData.bid_amount}
-                  onChange={(e) => setFormData({ ...formData, bid_amount: e.target.value })}
-                  placeholder="0.01"
-                />
-                <p className="mt-1 text-sm text-white/60">
-                  {formData.bid_model === 'CPM' ? 'Per 1,000 impressions' : 'Per click'}
-                </p>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 font-medium z-10">$</span>
+                  <Input
+                    id="bid_amount_usd"
+                    type="number"
+                    step="0.01"
+                    required
+                    variant="glass"
+                    value={usdAmounts.bid_amount_usd}
+                    onChange={(e) => handleUsdChange('bid_amount_usd', e.target.value)}
+                    className="pl-8 rounded-2xl"
+                    placeholder={formData.bid_model === 'CPM' ? '1.00' : '0.50'}
+                    inputMode="decimal"
+                  />
+                </div>
+                <div className="mt-1.5 space-y-1">
+                  <p className="text-sm text-white/60">
+                    {formData.bid_model === 'CPM' ? 'Per 1,000 impressions' : 'Per click'}
+                  </p>
+                  {usdAmounts.bid_amount_usd && ethPrice && (
+                    <p className="text-sm text-white/60">
+                      ≈ {parseFloat(formData.bid_amount || '0').toFixed(6)} ETH
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -221,21 +290,15 @@ export default function NewCampaignPage() {
               <h2 className="text-xl font-semibold text-white">Creative</h2>
               
               <div>
-                <Label htmlFor="creative_url" className="text-white/80 mb-2 block">
-                  Creative URL *
-                </Label>
-                <Input
-                  id="creative_url"
-                  type="url"
-                  required
-                  variant="glass"
+                <CreativeUpload
                   value={formData.creative_url}
-                  onChange={(e) => setFormData({ ...formData, creative_url: e.target.value })}
-                  placeholder="https://..."
+                  onChange={(url) => {
+                    setFormData({ ...formData, creative_url: url });
+                    setError(null); // Clear error when URL is set
+                  }}
+                  onError={(error) => setError(error)}
+                  token={getAuthToken() || ''}
                 />
-                <p className="mt-1 text-sm text-white/60">
-                  Upload to IPFS or use CDN URL
-                </p>
               </div>
 
               <div>

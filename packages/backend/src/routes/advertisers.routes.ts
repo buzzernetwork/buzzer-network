@@ -6,6 +6,8 @@
 import { Router } from 'express';
 import { dbPool } from '../config/database.js';
 import { authenticate, AuthenticatedRequest } from '../middleware/auth.middleware.js';
+import { uploadMiddleware, validateFileSize } from '../middleware/upload.middleware.js';
+import { uploadFile } from '../services/storage.service.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -279,7 +281,69 @@ router.patch('/campaigns/:id', authenticate, async (req: AuthenticatedRequest, r
   }
 });
 
+/**
+ * POST /api/v1/advertisers/campaigns/creative/upload
+ * Upload a creative file to R2 storage
+ */
+router.post(
+  '/campaigns/creative/upload',
+  authenticate,
+  uploadMiddleware.single('file'),
+  validateFileSize,
+  async (req: AuthenticatedRequest, res) => {
+    try {
+      const walletAddress = req.walletAddress;
+      
+      if (!walletAddress) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file provided' });
+      }
+
+      // Get advertiser ID
+      const advertiserResult = await dbPool.query(
+        'SELECT id FROM advertisers WHERE wallet_address = $1',
+        [walletAddress]
+      );
+
+      if (advertiserResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Advertiser not found. Please register first.' });
+      }
+
+      const advertiserId = advertiserResult.rows[0].id;
+      const { buffer, originalname, mimetype } = req.file;
+
+      // Upload to R2
+      const result = await uploadFile(
+        buffer,
+        originalname,
+        mimetype,
+        advertiserId
+      );
+
+      res.status(200).json({
+        success: true,
+        url: result.url,
+        key: result.key,
+        size: result.size,
+        contentType: result.contentType,
+      });
+    } catch (error) {
+      console.error('Creative upload error:', error);
+      res.status(500).json({
+        error: 'Upload failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  }
+);
+
 export default router;
+
+
+
 
 
 
